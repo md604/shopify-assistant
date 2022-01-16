@@ -1,0 +1,20 @@
+{
+    "name": "Shopify assistant",
+    "manifest_version": 3,
+    "version": "0.1",
+    "description": "Helps to see more details about Shopify pages",
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "tabs"
+    ],
+    "action": {
+        "default_title": "Shopify assistant",
+        "default_icon": "icon.png",
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    }
+}
