@@ -11,162 +11,94 @@ import {
   AccountConnection,
   ChoiceList,
   SettingToggle,
+  Tabs,
 } from '@shopify/polaris';
 import {ImportMinor} from '@shopify/polaris-icons';
 
-interface AccountProps {
-  onAction(): void;
-}
-
 export function App() {
-  const [first, setFirst] = useState('');
-  const [last, setLast] = useState('');
-  const [email, setEmail] = useState('');
-  const [checkboxes, setCheckboxes] = useState([]);
-  const [connected, setConnected] = useState(false);
+  const [filterQuery, setFilterQuery] = useState('');
 
-  const handleFirstChange = useCallback((value) => setFirst(value), []);
-  const handleLastChange = useCallback((value) => setLast(value), []);
-  const handleEmailChange = useCallback((value) => setEmail(value), []);
-  const handleCheckboxesChange = useCallback(
-    (value) => setCheckboxes(value),
+  const handleFilterQueryChange = useCallback((value) => setFilterQuery(value), []);
+  
+  const [selected, setSelected] = useState(0);
+
+  const handleTabChange = useCallback(
+    (selectedTabIndex) => setSelected(selectedTabIndex),
     [],
   );
 
-  const toggleConnection = useCallback(() => {
-    setConnected(!connected);
-  }, [connected]);
-
+  const tabs = [
+    {
+      id: 'all-customers-1',
+      content: 'All',
+      accessibilityLabel: 'All customers',
+      panelID: 'all-customers-content-1',
+    },
+    {
+      id: 'accepts-marketing-1',
+      content: 'Accepts marketing',
+      panelID: 'accepts-marketing-content-1',
+    },
+    {
+      id: 'repeat-customers-1',
+      content: 'Repeat customers',
+      panelID: 'repeat-customers-content-1',
+    },
+    {
+      id: 'prospects-1',
+      content: 'Prospects',
+      panelID: 'prospects-content-1',
+    },
+  ];
+/*
   const breadcrumbs = [
     {content: 'Sample apps', url: '/sample-apps'},
     {content: 'Create React App', url: '/create-react-app'},
   ];
   const primaryAction = {content: 'New product'};
   const secondaryActions = [{content: 'Import', icon: ImportMinor}];
-
-  const choiceListItems = [
-    {label: 'I accept the Terms of Service', value: 'false'},
-    {label: 'I consent to receiving emails', value: 'false2'},
-  ];
-
-  const accountSectionDescription = connected
-    ? 'Disconnect your account from your Shopify store.'
-    : 'Connect your account to your Shopify store.';
-
-  const accountMarkup = connected ? (
-    <DisconnectAccount onAction={toggleConnection} />
-  ) : (
-    <ConnectAccount onAction={toggleConnection} />
-  );
+*/
 
   return (
+    /*
     <Page
       title="Polaris"
       breadcrumbs={breadcrumbs}
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
     >
+    */
       <Layout>
-        <Layout.AnnotatedSection
-          title="Style"
-          description="Customize the style of your checkout"
-        >
-          <SettingToggle
-            action={{
-              content: 'Customize Checkout',
-            }}
-          >
-            Upload your store’s logo, change colors and fonts, and more.
-          </SettingToggle>
-        </Layout.AnnotatedSection>
-
-        <Layout.AnnotatedSection
-          title="Account"
-          description={accountSectionDescription}
-        >
-          {accountMarkup}
-        </Layout.AnnotatedSection>
-
-        <Layout.AnnotatedSection
-          title="Form"
-          description="A sample form using Polaris components."
-        >
+        <Layout.Section>
           <Card sectioned>
+            <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
+              <Card.Section title={tabs[selected].content}>
+                <p>Tab {selected} selected</p>
+              </Card.Section>
+            </Tabs>
             <FormLayout>
               <FormLayout.Group>
                 <TextField
-                  value={first}
-                  label="First name"
-                  placeholder="Tom"
-                  onChange={handleFirstChange}
+                  value={filterQuery}
+                  label="Filter themes"
+                  placeholder="Use theme's names or tags..."
+                  onChange={handleFilterQueryChange}
                   autoComplete="given-name"
                 />
-                <TextField
-                  value={last}
-                  label="Last name"
-                  placeholder="Ford"
-                  onChange={handleLastChange}
-                  autoComplete="family-name"
-                />
               </FormLayout.Group>
-
-              <TextField
-                value={email}
-                label="Email"
-                placeholder="example@email.com"
-                onChange={handleEmailChange}
-                autoComplete="email"
-              />
-
-              <ChoiceList
-                title="Terms & Consent"
-                titleHidden
-                allowMultiple
-                choices={choiceListItems}
-                selected={checkboxes}
-                onChange={handleCheckboxesChange}
-              />
-
-              <Button primary>Submit</Button>
             </FormLayout>
           </Card>
-        </Layout.AnnotatedSection>
+        </Layout.Section>
 
         <Layout.Section>
           <FooterHelp>
-            For more details on Polaris, visit our{' '}
-            <Link url="https://polaris.shopify.com">style guide</Link>.
+            For more details visit our{' '}
+            <Link url="https://github.com/md604/shopify-assistant">GitHub</Link>.
           </FooterHelp>
         </Layout.Section>
       </Layout>
+    /*
     </Page>
-  );
-}
-
-function ConnectAccount({onAction}: AccountProps) {
-  return (
-    <AccountConnection
-      action={{content: 'Connect', onAction}}
-      details="No account connected"
-      termsOfService={
-        <p>
-          By clicking Connect, you are accepting Sample’s{' '}
-          <Link url="https://polaris.shopify.com">Terms and Conditions</Link>,
-          including a commission rate of 15% on sales.
-        </p>
-      }
-    />
-  );
-}
-
-function DisconnectAccount({onAction}: AccountProps) {
-  return (
-    <AccountConnection
-      connected
-      action={{content: 'Disconnect', onAction}}
-      accountName="Tom Ford"
-      title={<Link url="http://google.com">Tom Ford</Link>}
-      details="Account id: d587647ae4"
-    />
+    */
   );
 }
