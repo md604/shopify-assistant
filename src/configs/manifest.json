@@ -4,9 +4,11 @@
     "version": "0.1",
     "description": "Helps to see more details about Shopify pages",
     "permissions": [
-      "activeTab",
-      "scripting",
-      "tabs"
+        "storage",
+        "webNavigation",
+        "activeTab",
+        "scripting",
+        "tabs"
     ],
     "action": {
         "default_title": "Shopify assistant",
