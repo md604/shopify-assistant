@@ -8,10 +8,17 @@ import {
 } from '@shopify/polaris';
 import {ImportMinor} from '@shopify/polaris-icons';
 import { Themes } from './Themes';
+import { PopupContext, ShopifyTheme } from './PopupContext';
 
 export function App() {
   const [selected, setSelected] = useState(0);
   const handleTabChange = useCallback((selectedTabIndex) => setSelected(selectedTabIndex),[]);
+
+  //context methods and hooks
+  const [themes, setThemes] = useState<ShopifyTheme[]>([]);
+  const updateThemes = (newThemes:ShopifyTheme[]) => {
+    setThemes(newThemes);
+  }
 
   const tabs = [
     {
@@ -22,6 +29,7 @@ export function App() {
   ];
 
   return (
+    <PopupContext.Provider value={{ themes, updateThemes }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>
@@ -38,5 +46,6 @@ export function App() {
           </FooterHelp>
         </Layout.Section>
       </Layout>
+    </PopupContext.Provider>
   );
 }
