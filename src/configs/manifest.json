@@ -10,6 +10,9 @@
         "scripting",
         "tabs"
     ],
+    "host_permissions": [
+        "https://*.myshopify.com/"
+    ],
     "action": {
         "default_title": "Shopify assistant",
         "default_icon": "icon.png",

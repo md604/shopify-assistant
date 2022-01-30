@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {
   Layout,
   FooterHelp,
@@ -9,6 +9,7 @@ import {
 import {ImportMinor} from '@shopify/polaris-icons';
 import { Themes } from './Themes';
 import { PopupContext, ShopifyTheme } from './PopupContext';
+import { getLocalThemes } from '../utils/storage';
 
 export function App() {
   const [selected, setSelected] = useState(0);
@@ -19,7 +20,12 @@ export function App() {
   const updateThemes = (newThemes:ShopifyTheme[]) => {
     setThemes(newThemes);
   }
-
+  
+  // update context after mount
+  useEffect(() => {
+    ( async () => setThemes(await getLocalThemes()) )(); 
+  },[]);
+  
   const tabs = [
     {
       id: 'themes-tab-1',

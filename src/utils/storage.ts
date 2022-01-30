@@ -1,18 +1,29 @@
 import { ShopifyTheme } from '../components/PopupContext';
 
-export async function getLocalThemes():Promise<ShopifyTheme[]> {
-    const result = await chrome.storage.local.get('themes');
-    if (result && result.themes) {
-        return result.themes.map((theme:any, i:number) => {
-            return {
-                name: `My theme ${i}`,
-                published: false,
-                developer: false,
-                id: `${i}`,
-            }
-        });
-    } 
-    return [];
+export function getLocalThemes():Promise<ShopifyTheme[]> {
+    return new Promise((resolve, reject) => {
+        try {
+            const key = 'themes';
+            chrome.storage.local.get(key, function(result) {
+                if (result && result[key]) {
+                    resolve(result[key].map((theme:any, i:number) => {
+                        return {
+                            name: `My theme ${i}`,
+                            published: false,
+                            developer: false,
+                            id: `${i}`,
+                        }
+                    }));
+                } else {
+                    console.log('Unvalid results in getLocalThemes function');
+                    reject([]);
+                }
+            });
+        } catch (err) {
+            console.log('Local storage error: ', err);
+            reject([]);
+        }
+    });
 }
 
 export default {}
