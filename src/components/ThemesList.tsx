@@ -13,11 +13,11 @@ export function ThemesList() {
     const [visibleThemes, setVisibleThemes] = useState([]);
     const { themes } = useContext(PopupContext);
     return (
-        <div>
+        <div style={{margin: '16px auto 0'}}>
             {
                 themes.length > 0 ?
                 themes.map(theme => (
-                    <Card title="Online store dashboard" sectioned>
+                    <Card title="Online store dashboard" key={theme.id} sectioned>
                         <p>View a summary of your online store’s performance.</p>
                     </Card>
                 )) :
