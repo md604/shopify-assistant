@@ -1,3 +1,5 @@
+import { isShopRecentlySynced } from './utils/storage';
+
 const filter = {
     url: [
         {
@@ -18,10 +20,16 @@ function fetchThemes(url:string) {
 }
 
 chrome.webNavigation.onCompleted.addListener((details) => {
-    const themesUrl = `${details.url.split('admin')[0]}admin/themes.json`;
+    const baseUrl = details.url.split('admin')[0], // https://.*myshopify.com/
+        domainName = baseUrl.split('//')[1].replace('/',''), // shopname.myshopify.com
+        themesUrl = `${baseUrl}admin/themes.json`;
     console.info("The user has loaded my favorite website!", details.url, themesUrl);
-   // Run script on the content page
-   chrome.scripting.executeScript({
+    // Check if this site was visited recently
+    if (isShopRecentlySynced(domainName)) {
+        console.log('Shop is ready for a sync: ', domainName);
+    }
+    // Run script on the content page
+    chrome.scripting.executeScript({
         target: { tabId: details.tabId },
         func: fetchThemes,
         args: [themesUrl]

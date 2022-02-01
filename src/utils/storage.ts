@@ -26,4 +26,8 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
     });
 }
 
+export function isShopRecentlySynced(shopDomain:string):boolean {
+    return true;
+}
+
 export default {}
