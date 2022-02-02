@@ -16,8 +16,8 @@ export function ThemesList() {
         <div style={{margin: '16px auto 0'}}>
             {
                 themes.length > 0 ?
-                themes.map(theme => (
-                    <Card title="Online store dashboard" key={theme.id} sectioned>
+                themes.map((theme,i) => (
+                    <Card title={theme.name} key={`${theme.id}-${i}`} sectioned>
                         <p>View a summary of your online store’s performance.</p>
                     </Card>
                 )) :
