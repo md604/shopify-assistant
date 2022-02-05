@@ -1,4 +1,3 @@
-import { ThemeStoreMajor } from '@shopify/polaris-icons';
 import { ShopifyTheme } from '../components/PopupContext';
 
 export function getLocalThemes():Promise<ShopifyTheme[]> {
@@ -26,7 +25,7 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
                             });
                         allThemes = [...allThemes, ...domainThemes];
                     }
-                    
+
                     resolve(allThemes);
                 } else {
                     console.log('Unvalid results in getLocalThemes function');
@@ -40,8 +39,36 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
     });
 }
 
-export function isShopRecentlySynced(shopDomain:string):boolean {
-    return false;
+export interface StorageThemesData {
+    domainName: string,
+    themes: any
+}
+
+export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean {
+    let storageUpdateResult:boolean = false;
+    const { domainName, themes } = data;
+    chrome.storage.local.get('shops', function(result) {
+        if (chrome.runtime.lastError) {
+            throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
+        }
+        let shop = { [domainName]: { themes } }, 
+            shops = {};
+        if (result && result['shops'] && result['shops'][domainName]) {
+            shop[domainName] = {...result['shops'][domainName], ...shop[domainName]};
+        } 
+        shops = { ...result['shops'], ...shop };
+
+        chrome.storage.local.set({ shops }, 
+        function() {
+            if (chrome.runtime.lastError) {
+                // will last catch get this error?
+                throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
+            }
+            console.log('Shops data has been updated in a local storage: ', shops);
+            storageUpdateResult = true; 
+        });
+    });
+    return storageUpdateResult;
 }
 
 export default {}
