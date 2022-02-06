@@ -29,8 +29,13 @@ export function App() {
   const tabs = [
     {
       id: 'themes-tab-1',
-      content: 'Themes',
+      content: 'All themes',
       panelID: 'themes-tab-content-1',
+    },
+    {
+      id: 'themes-tab-2',
+      content: 'Pinned themes',
+      panelID: 'themes-tab-content-2',
     }
   ];
 

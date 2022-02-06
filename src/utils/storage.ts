@@ -28,8 +28,8 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
 
                     resolve(allThemes);
                 } else {
-                    console.log('Unvalid results in getLocalThemes function');
-                    reject([]);
+                    console.log(`Can't find a root object "${rootKey}" in the storage (getLocalThemes function)`);
+                    resolve([]);
                 }
             });
         } catch (err) {
@@ -51,15 +51,17 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
         if (chrome.runtime.lastError) {
             throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
         }
+
         let shop = { [domainName]: { themes } }, 
             shops = {};
+
         if (result && result['shops'] && result['shops'][domainName]) {
             shop[domainName] = {...result['shops'][domainName], ...shop[domainName]};
         } 
+
         shops = { ...result['shops'], ...shop };
 
-        chrome.storage.local.set({ shops }, 
-        function() {
+        chrome.storage.local.set({ shops }, function() {
             if (chrome.runtime.lastError) {
                 // will last catch get this error?
                 throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
