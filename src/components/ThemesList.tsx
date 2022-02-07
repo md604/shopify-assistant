@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Card, 
     Icon, 
+    Badge,
     Stack, 
     Heading, 
     Subheading, 
@@ -11,7 +12,14 @@ import { Card,
     TextContainer,
     Caption,
     TextStyle } from '@shopify/polaris';
-import { LinkMinor, ProductsMajor, NoteMajor, SettingsMajor, PinMajor, CircleTickMinor } from '@shopify/polaris-icons';
+import { LinkMinor, 
+    ProductsMajor,
+    NoteMajor,
+    SettingsMajor,
+    PinMajor,
+    CircleTickMinor,
+    ClipboardMinor,
+    ShopcodesMajor } from '@shopify/polaris-icons';
 import { ShopifyTheme, PopupContext } from './PopupContext';
 /*
 interface ThemesListProps {
@@ -49,33 +57,65 @@ export function ThemesList() {
                 themes.map((theme,i) => (
                     <Card key={`${theme.id}-${i}`}>
                         <Card.Section>
-                            <Stack wrap={false} distribution="fill" spacing="loose">
-                                <Stack>
-                                    <Stack wrap={false}>
-                                        <Icon source={CircleTickMinor} color="success" />
+                            <div style={{ width:'100%', display: 'flex' }}>
+                                <div style={{ maxWidth:'calc(100% - 56px)', width: '100%' }}>
+                                    <Stack vertical={true}>
+                                        <Stack>
+                                            <Badge
+                                                status="success"
+                                                progress="complete"
+                                                statusAndProgressLabelOverride="Status: Published. Your online store is visible."
+                                                >
+                                                Live
+                                            </Badge>
+                                            <TextStyle variation="subdued">Updated 3 days ago</TextStyle>
+                                        </Stack>
                                         <Heading>{theme.name}</Heading>
                                     </Stack>
                                     <TextContainer spacing="tight">
                                         <p><TextStyle variation="subdued">vue-js-example.myshopify.com</TextStyle></p>
                                     </TextContainer>
-                                </Stack>
-                                <Stack>
-                                <Button icon={
-                                    <Icon source={PinMajor} />
-                                }></Button></Stack>
-                            </Stack>
+                                </div>
+                                <div style={{ minWidth: '56px', textAlign: 'right' }}>
+                                    <Button icon={
+                                        <Icon source={PinMajor} />
+                                    }></Button>
+                                </div>
+                            </div>
                         </Card.Section>
                         <Card.Section
                             title={
-                            <Stack>
-                                <Icon source={LinkMinor} />
-                                <Subheading>Links</Subheading>
+                            <Stack distribution="equalSpacing">
+                                <Stack>
+                                    <Icon source={LinkMinor} />
+                                    <Subheading>Links</Subheading>
+                                </Stack>
+                                <Button plain monochrome>Edit</Button>
                             </Stack>
                             }
                         >
-                            link1, link2
+                            <Stack spacing="loose">
+                                <ButtonGroup segmented>
+                                    <Button>View</Button>
+                                    <Button icon={
+                                        <Icon source={ClipboardMinor} />
+                                    }></Button>
+                                    <Button icon={
+                                        <Icon source={ShopcodesMajor} />
+                                    }></Button>
+                                </ButtonGroup>
+                                <ButtonGroup segmented>
+                                    <Button>Configure</Button>
+                                    <Button icon={
+                                        <Icon source={ClipboardMinor} />
+                                    }></Button>
+                                    <Button icon={
+                                        <Icon source={ShopcodesMajor} />
+                                    }></Button>
+                                </ButtonGroup>
+                            </Stack>
                         </Card.Section>
-                        <Card.Section
+                        { false && <Card.Section
                             title={
                             <Stack>
                                 <Icon source={ProductsMajor} />
@@ -84,8 +124,8 @@ export function ThemesList() {
                             }
                         >
                             There are no tags
-                        </Card.Section>
-                        <Card.Section
+                        </Card.Section>}
+                        { false && <Card.Section
                             title={
                             <Stack>
                                 <Icon source={NoteMajor} />
@@ -94,7 +134,10 @@ export function ThemesList() {
                             }
                         >
                             There are no notes
-                        </Card.Section>
+                        </Card.Section>}
+                        <div style={{ background:'#efefef' }}>
+                            <Button plain monochrome fullWidth>Show more options</Button>
+                        </div>
                     </Card>
                 )) :
                 <div>There are no local themes</div>
