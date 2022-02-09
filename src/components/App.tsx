@@ -8,8 +8,9 @@ import {
 } from '@shopify/polaris';
 import {ImportMinor} from '@shopify/polaris-icons';
 import { Themes } from './Themes';
-import { PopupContext, ShopifyTheme } from './PopupContext';
+import { PopupContext } from './PopupContext';
 import { getLocalThemes } from '../utils/storage';
+import { ShopifyTheme } from '../utils/interfaces';
 
 export function App() {
   const [selected, setSelected] = useState(0);

@@ -1,11 +1,5 @@
 import React from 'react';
-
-export interface ShopifyTheme {
-    name: string;
-    published: boolean;
-    developer: boolean;
-    id: string;
-}
+import { ShopifyTheme } from '../utils/interfaces';
 
 export interface ContextState {
     // set the type of state you want to handle with context e.g.

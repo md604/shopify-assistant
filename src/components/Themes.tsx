@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {
     FormLayout,
     TextField,
@@ -11,6 +11,18 @@ export function Themes() {
     const [filterQuery, setFilterQuery] = useState('');
   
     const handleFilterQueryChange = useCallback((value) => setFilterQuery(value), []);
+
+    // update context after mount
+    useEffect(() => {
+        //( async () => setThemes(await getLocalThemes()) )(); 
+        chrome.runtime.sendMessage(
+            {
+                type: 'searchQuery',
+                query: filterQuery
+            }
+        );
+        console.log('You typed: ', filterQuery);
+    },[filterQuery]);
     
     return (
         <div>

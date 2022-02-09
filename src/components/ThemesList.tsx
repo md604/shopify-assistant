@@ -20,7 +20,8 @@ import { LinkMinor,
     CircleTickMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
-import { ShopifyTheme, PopupContext } from './PopupContext';
+import { PopupContext } from './PopupContext';
+import { ShopifyTheme } from '../utils/interfaces';
 /*
 interface ThemesListProps {
     themes: ShopifyTheme[];

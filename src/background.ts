@@ -1,4 +1,6 @@
 import { storageUpdateOriginalThemesData } from './utils/storage';
+import { getSearchResults, addSearchThemesToIndex } from './utils/search';
+import { SimpleDocumentSearchResultSetUnit } from 'flexsearch';
 
 const filter = {
     url: [
@@ -47,7 +49,7 @@ function fetchShopThemes(url:string, domainName:string) {
 
 // Listen for messages from the site
 chrome.runtime.onMessage.addListener(
-    function(message, sender, sendResponse) {
+    async function(message, sender, sendResponse) {
         if (message.type) {
             switch (message.type) {
                 case 'newThemes': 
@@ -56,6 +58,15 @@ chrome.runtime.onMessage.addListener(
                     domainName: message.domainName,
                     themes: message.data.themes ? message.data.themes : [] 
                 });
+                break;
+                case 'searchQuery':
+                    const results:SimpleDocumentSearchResultSetUnit[] = await getSearchResults(message.query);
+                    if (results && results.length > 0) {
+                        console.log(`Got search results for "${message.query}":`);
+                        for(let i = 0; i < results.length; i++){
+                            console.log('Fields:', results[i].result);
+                        }    
+                    }
                 break;
                 default: console.log('Unknown message type');
             }
@@ -82,9 +93,11 @@ chrome.webNavigation.onCompleted.addListener((details) => {
     }
 }, filter);
 
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
         console.log('Loaded a new extention version. Cooldown map state: ', shopCooldownMap);
+        console.log('Create search index...');
+        await addSearchThemesToIndex();
     }
     /*
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
