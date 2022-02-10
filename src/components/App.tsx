@@ -40,6 +40,22 @@ export function App() {
     }
   ];
 
+  chrome.runtime.onMessage.addListener(
+    async function(message, sender, sendResponse) {
+      if (message.type) {
+          switch (message.type) {
+              case 'searchResults':
+                  console.log('Search results: ', message.results);
+                  //setThemes(message.results);
+              break;
+              default: console.log('(Popup listener) Unknown message type');
+          }
+      } else {
+          console.log('(Popup listener) Message type is not present');
+      }
+    }
+  );
+
   return (
     <PopupContext.Provider value={{ themes, updateThemes }}>
       <Layout>

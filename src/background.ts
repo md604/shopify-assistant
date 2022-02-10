@@ -53,19 +53,26 @@ chrome.runtime.onMessage.addListener(
         if (message.type) {
             switch (message.type) {
                 case 'newThemes': 
-                console.log('Got a message of type THEMES', message.data);
-                storageUpdateOriginalThemesData({
-                    domainName: message.domainName,
-                    themes: message.data.themes ? message.data.themes : [] 
-                });
+                    console.log('Got a message of type THEMES', message.data);
+                    storageUpdateOriginalThemesData({
+                        domainName: message.domainName,
+                        themes: message.data.themes ? message.data.themes : [] 
+                    });
                 break;
                 case 'searchQuery':
                     const results:SimpleDocumentSearchResultSetUnit[] = await getSearchResults(message.query);
+                    console.log('(background js) Got a search querry and results:', results);
                     if (results && results.length > 0) {
                         console.log(`Got search results for "${message.query}":`);
                         for(let i = 0; i < results.length; i++){
                             console.log('Fields:', results[i].result);
-                        }    
+                        }
+                        chrome.runtime.sendMessage(
+                            {
+                                type: 'searchResults',
+                                results
+                            }
+                        );    
                     }
                 break;
                 default: console.log('Unknown message type');

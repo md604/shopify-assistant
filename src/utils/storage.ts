@@ -69,7 +69,7 @@ export function getLocalSearchThemes():Promise<SearchTheme[]> {
 
                     resolve(allThemes);
                 } else {
-                    console.log(`Can't find a root object "${rootKey}" in the storage (getLocalSearchThemes function)`);
+                    console.log(`Can't find a root object "${rootKey}" in the storage (getLocalThemes function)`);
                     resolve([]);
                 }
             });

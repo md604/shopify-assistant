@@ -1,7 +1,6 @@
-import { Index, Document } from 'flexsearch';
-import { getLocalSearchThemes } from './storage';
-import { SearchTheme } from './interfaces'; 
-import { SimpleDocumentSearchResultSetUnit } from 'flexsearch';
+import { Document, SimpleDocumentSearchResultSetUnit } from 'flexsearch';
+import { getLocalThemes } from './storage';
+import { ShopifyTheme } from './interfaces'; 
 
 // search index
 const index = new Document({
@@ -10,13 +9,14 @@ const index = new Document({
         index: ["name"]
     }
 });
+console.log('init search index');
 
 // receive a search query message function
 // send a search query message function
 // create document data model function
 // add documents to the search index function
 export async function addSearchThemesToIndex():Promise<void> {
-    const searchThemes:SearchTheme[] = await getLocalSearchThemes();
+    const searchThemes:ShopifyTheme[] = await getLocalThemes();
     for(let i=0; i < searchThemes.length; i++) {
         index.add(searchThemes[i]);
     }
