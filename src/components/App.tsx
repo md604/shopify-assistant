@@ -25,6 +25,11 @@ export function App() {
   // update context after mount
   useEffect(() => {
     ( async () => setThemes(await getLocalThemes()) )(); 
+    chrome.runtime.sendMessage(
+      {
+        type: 'createSearchIndex'
+      }
+    );
   },[]);
   
   const tabs = [

@@ -1,5 +1,7 @@
 import { storageUpdateOriginalThemesData } from './utils/storage';
-import { getSearchResults, addSearchThemesToIndex } from './utils/search';
+import { getSearchResults, 
+    addShopifyThemesToIndex,
+    getIndexShopifyThemesEntriesNumber } from './utils/search';
 import { SimpleDocumentSearchResultSetUnit } from 'flexsearch';
 
 const filter = {
@@ -52,6 +54,17 @@ chrome.runtime.onMessage.addListener(
     async function(message, sender, sendResponse) {
         if (message.type) {
             switch (message.type) {
+                case 'createSearchIndex':
+                    console.log('Docs in the index before adding: ', getIndexShopifyThemesEntriesNumber());
+                    await addShopifyThemesToIndex();
+                    console.log('Docs in the index after adding: ', getIndexShopifyThemesEntriesNumber());
+                    chrome.runtime.sendMessage(
+                        {
+                            type: 'enableSearch',
+                            to: 'popup'
+                        }
+                    );    
+                break;
                 case 'newThemes': 
                     console.log('Got a message of type THEMES', message.data);
                     storageUpdateOriginalThemesData({
@@ -102,9 +115,8 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 
 chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-        console.log('Loaded a new extention version. Cooldown map state: ', shopCooldownMap);
-        console.log('Create search index...');
-        await addSearchThemesToIndex();
+        // create new search index
+        await addShopifyThemesToIndex();
     }
     /*
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
