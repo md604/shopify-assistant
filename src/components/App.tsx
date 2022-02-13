@@ -8,9 +8,9 @@ import {
 } from '@shopify/polaris';
 import {ImportMinor} from '@shopify/polaris-icons';
 import { Themes } from './Themes';
-import { PopupContext } from './PopupContext';
+import { PopupContext, initAppConfig } from './PopupContext';
 import { getLocalThemes } from '../utils/storage';
-import { ShopifyTheme } from '../utils/interfaces';
+import { ShopifyTheme, AppConfig } from '../utils/interfaces';
 
 export function App() {
   const [selected, setSelected] = useState(0);
@@ -21,13 +21,19 @@ export function App() {
   const updateThemes = (newThemes:ShopifyTheme[]) => {
     setThemes(newThemes);
   }
+  const [config, setConfig] = useState<AppConfig>(initAppConfig);
+  const updateConfig = (newConfig:Partial<AppConfig>) => {
+    setConfig({...config, ...newConfig});
+  }
   
   // update context after mount
   useEffect(() => {
-    ( async () => setThemes(await getLocalThemes()) )(); 
+    ( async () => setThemes(await getLocalThemes()) )();
+    // request to refresh a search index when open popup 
     chrome.runtime.sendMessage(
       {
-        type: 'createSearchIndex'
+        type: 'createSearchIndex',
+        to: 'sw'
       }
     );
   },[]);
@@ -47,22 +53,26 @@ export function App() {
 
   chrome.runtime.onMessage.addListener(
     async function(message, sender, sendResponse) {
-      if (message.type) {
+      if (message.to == 'popup' && message.type) {
           switch (message.type) {
               case 'searchResults':
                   console.log('Search results: ', message.results);
                   //setThemes(message.results);
               break;
+              case 'updateSearchState':
+                  console.log('New search state: ', message.value);
+                  updateConfig({ enableSearchBar: message.value });
+              break;
               default: console.log('(Popup listener) Unknown message type');
           }
       } else {
-          console.log('(Popup listener) Message type is not present');
+          console.log('(Popup listener) Wrong recepient or message type is not present');
       }
     }
   );
 
   return (
-    <PopupContext.Provider value={{ themes, updateThemes }}>
+    <PopupContext.Provider value={{ config, themes, updateThemes }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>

@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, { useState, useCallback, useEffect , useContext } from 'react';
 import {
     FormLayout,
     TextField,
@@ -6,19 +6,19 @@ import {
   } from '@shopify/polaris';
 import { SearchMinor } from '@shopify/polaris-icons';
 import { ThemesList } from './ThemesList';
+import { PopupContext } from './PopupContext';
 
 export function Themes() {
     const [filterQuery, setFilterQuery] = useState('');
-  
     const handleFilterQueryChange = useCallback((value) => setFilterQuery(value), []);
+    const { config } = useContext(PopupContext);
 
-    // update context after mount
-    useEffect(() => {
-        //( async () => setThemes(await getLocalThemes()) )(); 
+    useEffect(() => { 
         chrome.runtime.sendMessage(
             {
                 type: 'searchQuery',
-                query: filterQuery
+                query: filterQuery,
+                to: 'sw'
             }
         );
         console.log('You typed: ', filterQuery);
@@ -30,6 +30,7 @@ export function Themes() {
                 <div style={{height: '5px'}}></div>
                 <TextField
                 value={filterQuery}
+                disabled={!config.enableSearchBar}
                 label="Filter themes"
                 labelHidden
                 clearButton

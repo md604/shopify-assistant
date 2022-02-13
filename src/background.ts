@@ -42,7 +42,8 @@ function fetchShopThemes(url:string, domainName:string) {
             {
                 type: 'newThemes',
                 domainName,
-                data
+                data,
+                to: 'sw'
             }
         );
     })
@@ -52,7 +53,7 @@ function fetchShopThemes(url:string, domainName:string) {
 // Listen for messages from the site
 chrome.runtime.onMessage.addListener(
     async function(message, sender, sendResponse) {
-        if (message.type) {
+        if (message.to == 'sw' && message.type) {
             switch (message.type) {
                 case 'createSearchIndex':
                     console.log('Docs in the index before adding: ', getIndexShopifyThemesEntriesNumber());
@@ -60,12 +61,14 @@ chrome.runtime.onMessage.addListener(
                     console.log('Docs in the index after adding: ', getIndexShopifyThemesEntriesNumber());
                     chrome.runtime.sendMessage(
                         {
-                            type: 'enableSearch',
+                            type: 'updateSearchState',
+                            value: true,
                             to: 'popup'
                         }
                     );    
                 break;
                 case 'newThemes': 
+                    // a message comes from the injected script that picks shopify themes
                     console.log('Got a message of type THEMES', message.data);
                     storageUpdateOriginalThemesData({
                         domainName: message.domainName,
@@ -83,7 +86,8 @@ chrome.runtime.onMessage.addListener(
                         chrome.runtime.sendMessage(
                             {
                                 type: 'searchResults',
-                                results
+                                results,
+                                to: 'popup'
                             }
                         );    
                     }

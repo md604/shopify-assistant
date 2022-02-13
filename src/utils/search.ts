@@ -6,7 +6,8 @@ import { ShopifyTheme } from './interfaces';
 let indexShopifyThemes = new Document({
     document: {
         id: "id",
-        index: ["name"]
+        index: ["name"],
+        //store: true
     }
 });
 // counts a number of documents in the search index
@@ -17,9 +18,10 @@ let indexShopifyThemesEntriesNumber:number = 0;
 // add documents to the search index function
 export async function addShopifyThemesToIndex():Promise<void> {
     if (indexShopifyThemesEntriesNumber == 0) {
-        const searchThemes:ShopifyTheme[] = await getLocalThemes();
-        for(let i=0; i < searchThemes.length; i++) {
-            indexShopifyThemes.add(searchThemes[i]);
+        const localThemes:ShopifyTheme[] = await getLocalThemes();
+        for(let i=0; i < localThemes.length; i++) {
+            console.log('Indexed theme: ', localThemes[i]);
+            indexShopifyThemes.add(localThemes[i]);
             indexShopifyThemesEntriesNumber++; // count added entry
         }
     }
@@ -29,7 +31,7 @@ export function getIndexShopifyThemesEntriesNumber():number {
 }
 // get search results function
 export async function getSearchResults(query:string):Promise<SimpleDocumentSearchResultSetUnit[]> {
-    return indexShopifyThemes.searchAsync(query);
+    return indexShopifyThemes.searchAsync(query, { enrich: true });
 };
 
 export {};
