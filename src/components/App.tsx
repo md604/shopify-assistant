@@ -21,6 +21,10 @@ export function App() {
   const updateThemes = (newThemes:ShopifyTheme[]) => {
     setThemes(newThemes);
   }
+  const resetThemes = async () => {
+    const newThemes:ShopifyTheme[] = await getLocalThemes();
+    setThemes(newThemes);
+  }
   const [config, setConfig] = useState<AppConfig>(initAppConfig);
   const updateConfig = (newConfig:Partial<AppConfig>) => {
     setConfig({...config, ...newConfig});
@@ -57,7 +61,7 @@ export function App() {
           switch (message.type) {
               case 'searchResults':
                   console.log('Search results: ', message.results);
-                  //setThemes(message.results);
+                  if (message.results && message.results.length > 0) setThemes(message.results);
               break;
               case 'updateSearchState':
                   console.log('New search state: ', message.value);
@@ -72,7 +76,7 @@ export function App() {
   );
 
   return (
-    <PopupContext.Provider value={{ config, themes, updateThemes }}>
+    <PopupContext.Provider value={{ config, themes, updateThemes, resetThemes }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>

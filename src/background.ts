@@ -1,8 +1,9 @@
 import { storageUpdateOriginalThemesData } from './utils/storage';
+import { ShopifyTheme } from './utils/interfaces';
 import { getSearchResults, 
     addShopifyThemesToIndex,
     getIndexShopifyThemesEntriesNumber } from './utils/search';
-import { SimpleDocumentSearchResultSetUnit } from 'flexsearch';
+import { EnrichedDocumentSearchResultSetUnit } from 'flexsearch';
 
 const filter = {
     url: [
@@ -76,17 +77,21 @@ chrome.runtime.onMessage.addListener(
                     });
                 break;
                 case 'searchQuery':
-                    const results:SimpleDocumentSearchResultSetUnit[] = await getSearchResults(message.query);
+                    const results:EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[] = await getSearchResults(message.query);
                     console.log('(background js) Got a search querry and results:', results);
                     if (results && results.length > 0) {
-                        console.log(`Got search results for "${message.query}":`);
+                        const themes:ShopifyTheme[] = [];
+                        
                         for(let i = 0; i < results.length; i++){
-                            console.log('Fields:', results[i].result);
+                            for(let j = 0; j < results[i].result.length; j++){
+                                themes.push(results[i].result[j].doc);
+                            }
                         }
+                        
                         chrome.runtime.sendMessage(
                             {
                                 type: 'searchResults',
-                                results,
+                                results: themes,
                                 to: 'popup'
                             }
                         );    

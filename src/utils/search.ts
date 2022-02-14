@@ -1,13 +1,13 @@
-import { Document, SimpleDocumentSearchResultSetUnit } from 'flexsearch';
+import { Document, EnrichedDocumentSearchResultSetUnit, SimpleDocumentSearchResultSetUnit } from 'flexsearch';
 import { getLocalThemes } from './storage';
 import { ShopifyTheme } from './interfaces'; 
 
 // search index is always defined and available
-let indexShopifyThemes = new Document({
+let indexShopifyThemes = new Document<ShopifyTheme, true>({
     document: {
         id: "id",
         index: ["name"],
-        //store: true
+        store: true
     }
 });
 // counts a number of documents in the search index
@@ -30,7 +30,8 @@ export function getIndexShopifyThemesEntriesNumber():number {
     return indexShopifyThemesEntriesNumber;
 }
 // get search results function
-export async function getSearchResults(query:string):Promise<SimpleDocumentSearchResultSetUnit[]> {
+//SimpleDocumentSearchResultSetUnit[]
+export async function getSearchResults(query:string):Promise<EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[]> {
     return indexShopifyThemes.searchAsync(query, { enrich: true });
 };
 

@@ -11,7 +11,12 @@ import { PopupContext } from './PopupContext';
 export function Themes() {
     const [filterQuery, setFilterQuery] = useState('');
     const handleFilterQueryChange = useCallback((value) => setFilterQuery(value), []);
-    const { config } = useContext(PopupContext);
+    const handleFilterQueryClear = useCallback(() => {
+        setFilterQuery('');
+        resetThemes();
+        console.log('Clear search query and show full theme list');
+    }, []);
+    const { config, resetThemes } = useContext(PopupContext);
 
     useEffect(() => { 
         chrome.runtime.sendMessage(
@@ -36,6 +41,7 @@ export function Themes() {
                 clearButton
                 placeholder="Use theme's names or tags..."
                 onChange={handleFilterQueryChange}
+                onClearButtonClick={handleFilterQueryClear}
                 autoComplete="given-name"
                 prefix={
                     <Icon source={SearchMinor} />
