@@ -126,6 +126,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
         // create new search index
         await addShopifyThemesToIndex();
+        //console.log(ServiceWorker.state);
     }
     /*
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {

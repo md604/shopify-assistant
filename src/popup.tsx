@@ -15,10 +15,27 @@ function WrappedApp() {
   );
 }
 */
+// init search worker
+const searchWorker = new Worker(
+  chrome.runtime.getURL('searchWorker.js'), 
+  {
+    type: 'module'
+  }
+);
+
+function getWorker():Worker {
+  return searchWorker;
+}
+
+searchWorker.addEventListener('message', e => {
+  console.log(e.data);
+});
+searchWorker.postMessage('hello');
+
 //ReactDOM.render(<WrappedApp />, document.getElementById('root'));
 ReactDOM.render(
   <AppProvider i18n={enTranslations}>
-    <App />
+    <App getSearchWorker={getWorker} />
   </AppProvider>,
   document.getElementById('root'),
 );

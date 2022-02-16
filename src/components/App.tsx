@@ -12,7 +12,15 @@ import { PopupContext, initAppConfig } from './PopupContext';
 import { getLocalThemes } from '../utils/storage';
 import { ShopifyTheme, AppConfig } from '../utils/interfaces';
 
-export function App() {
+
+type Props = {
+  //state: string;
+  //setState: (val: string) => void;
+  getSearchWorker: () => Worker;
+  //placeholder: string;
+};
+
+export function App({getSearchWorker}: Props) {
   const [selected, setSelected] = useState(0);
   const handleTabChange = useCallback((selectedTabIndex) => setSelected(selectedTabIndex),[]);
 
@@ -40,6 +48,26 @@ export function App() {
         to: 'sw'
       }
     );
+    chrome.runtime.onMessage.addListener(
+      async function(message, sender, sendResponse) {
+        if (message.to == 'popup' && message.type) {
+            switch (message.type) {
+                case 'searchResults':
+                    console.log('Search results: ', message.results);
+                    if (message.results && message.results.length > 0) setThemes(message.results);
+                break;
+                case 'updateSearchState':
+                    console.log('New search state: ', message.value);
+                    updateConfig({ enableSearchBar: message.value });
+                break;
+                default: console.log('(Popup listener) Unknown message type');
+            }
+        } else {
+            console.log('(Popup listener) Wrong recepient or message type is not present');
+        }
+      }
+    );
+    console.log('Console log once');
   },[]);
   
   const tabs = [
@@ -54,26 +82,6 @@ export function App() {
       panelID: 'themes-tab-content-2',
     }
   ];
-
-  chrome.runtime.onMessage.addListener(
-    async function(message, sender, sendResponse) {
-      if (message.to == 'popup' && message.type) {
-          switch (message.type) {
-              case 'searchResults':
-                  console.log('Search results: ', message.results);
-                  if (message.results && message.results.length > 0) setThemes(message.results);
-              break;
-              case 'updateSearchState':
-                  console.log('New search state: ', message.value);
-                  updateConfig({ enableSearchBar: message.value });
-              break;
-              default: console.log('(Popup listener) Unknown message type');
-          }
-      } else {
-          console.log('(Popup listener) Wrong recepient or message type is not present');
-      }
-    }
-  );
 
   return (
     <PopupContext.Provider value={{ config, themes, updateThemes, resetThemes }}>

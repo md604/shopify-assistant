@@ -6,7 +6,8 @@ module.exports = {
   devtool: 'cheap-module-source-map',
   entry: {
     popup: join(__dirname, 'src/popup.tsx'),
-    background: join(__dirname, 'src/background.ts')
+    background: join(__dirname, 'src/background.ts'),
+    searchWorker: join(__dirname, 'src/searchWorker.ts')
   },
   output: {
     path: join(__dirname, 'dist'),
