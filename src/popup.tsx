@@ -6,15 +6,7 @@ import '@shopify/polaris/dist/styles.css';
 import './styles/popup.scss';
 
 import { App } from './components/App';
-/*
-function WrappedApp() {
-  return (
-    <AppProvider i18n={enTranslations}>
-      <App />
-    </AppProvider>
-  );
-}
-*/
+
 // init search worker
 const searchWorker = new Worker(
   chrome.runtime.getURL('searchWorker.js'), 
@@ -27,12 +19,13 @@ function getWorker():Worker {
   return searchWorker;
 }
 
+/*
 searchWorker.addEventListener('message', e => {
   console.log(e.data);
 });
 searchWorker.postMessage('hello');
+*/
 
-//ReactDOM.render(<WrappedApp />, document.getElementById('root'));
 ReactDOM.render(
   <AppProvider i18n={enTranslations}>
     <App getSearchWorker={getWorker} />

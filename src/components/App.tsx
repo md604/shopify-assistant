@@ -21,6 +21,8 @@ type Props = {
 };
 
 export function App({getSearchWorker}: Props) {
+  const [searchWorker, setSearchWorker] = useState(getSearchWorker());
+
   const [selected, setSelected] = useState(0);
   const handleTabChange = useCallback((selectedTabIndex) => setSelected(selectedTabIndex),[]);
 
@@ -42,12 +44,16 @@ export function App({getSearchWorker}: Props) {
   useEffect(() => {
     ( async () => setThemes(await getLocalThemes()) )();
     // request to refresh a search index when open popup 
+    /*
     chrome.runtime.sendMessage(
       {
         type: 'createSearchIndex',
         to: 'sw'
       }
     );
+    */
+    //searchWorker.postMessage('hello');
+
     chrome.runtime.onMessage.addListener(
       async function(message, sender, sendResponse) {
         if (message.to == 'popup' && message.type) {
