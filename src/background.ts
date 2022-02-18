@@ -56,6 +56,7 @@ chrome.runtime.onMessage.addListener(
     async function(message, sender, sendResponse) {
         if (message.to == 'sw' && message.type) {
             switch (message.type) {
+                /*
                 case 'createSearchIndex':
                     console.log('Docs in the index before adding: ', getIndexShopifyThemesEntriesNumber());
                     await addShopifyThemesToIndex();
@@ -68,6 +69,7 @@ chrome.runtime.onMessage.addListener(
                         }
                     );    
                 break;
+                */
                 case 'newThemes': 
                     // a message comes from the injected script that picks shopify themes
                     console.log('Got a message of type THEMES', message.data);
@@ -76,6 +78,7 @@ chrome.runtime.onMessage.addListener(
                         themes: message.data.themes ? message.data.themes : [] 
                     });
                 break;
+                /*
                 case 'searchQuery':
                     const results:EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[] = await getSearchResults(message.query);
                     console.log('(background js) Got a search querry and results:', results);
@@ -97,6 +100,7 @@ chrome.runtime.onMessage.addListener(
                         );    
                     }
                 break;
+                */
                 default: console.log('Unknown message type');
             }
         } else {
@@ -125,7 +129,7 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
         // create new search index
-        await addShopifyThemesToIndex();
+        // await addShopifyThemesToIndex();
         //console.log(ServiceWorker.state);
     }
     /*

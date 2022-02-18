@@ -5,6 +5,7 @@ export interface ContextState {
     // set the type of state you want to handle with context e.g.
     config: AppConfig;
     themes: ShopifyTheme[];
+    getSearchWorker?: () => Worker;
     updateThemes: (newThemes:ShopifyTheme[]) => void;
     resetThemes: () => void;
 }

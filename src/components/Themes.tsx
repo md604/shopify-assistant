@@ -16,17 +16,21 @@ export function Themes() {
         resetThemes();
         console.log('Clear search query and show full theme list');
     }, []);
-    const { config, resetThemes } = useContext(PopupContext);
+    const { config, resetThemes, getSearchWorker } = useContext(PopupContext);
+    //const [searchWorker, setSearchWorker] = useState<Worker>(getSearchWorker ? getSearchWorker() : );
 
     useEffect(() => { 
-        chrome.runtime.sendMessage(
-            {
-                type: 'searchQuery',
-                query: filterQuery,
-                to: 'sw'
-            }
-        );
-        console.log('You typed: ', filterQuery);
+        if (getSearchWorker) {
+            const searchWorker = getSearchWorker();
+            searchWorker.postMessage(
+                {   
+                    type: 'searchQuery',
+                    query: filterQuery,
+                    to: 'sw'
+                }
+            );
+            console.log('You typed: ', filterQuery);
+        }
     },[filterQuery]);
     
     return (

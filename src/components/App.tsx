@@ -43,39 +43,29 @@ export function App({getSearchWorker}: Props) {
   // update context after mount
   useEffect(() => {
     ( async () => setThemes(await getLocalThemes()) )();
-    // request to refresh a search index when open popup 
-    /*
-    chrome.runtime.sendMessage(
-      {
-        type: 'createSearchIndex',
-        to: 'sw'
+    
+    searchWorker.addEventListener('message', async function(e) {
+      const message = e.data;
+      if (message.type) {
+          switch (message.type) {
+              case 'searchResults':
+                  console.log('Search results: ', message.results);
+                  if (message.results && message.results.length > 0) setThemes(message.results);
+              break;
+              case 'updateSearchState':
+                  console.log('New search state: ', message.value);
+                  updateConfig({ enableSearchBar: message.value });
+              break;
+              default: console.log('(Popup listener) Unknown message type');
+          }
+      } else {
+          console.log('(Popup listener) Wrong recepient or message type is not present');
       }
-    );
-    */
-    //searchWorker.postMessage('hello');
-
-    chrome.runtime.onMessage.addListener(
-      async function(message, sender, sendResponse) {
-        if (message.to == 'popup' && message.type) {
-            switch (message.type) {
-                case 'searchResults':
-                    console.log('Search results: ', message.results);
-                    if (message.results && message.results.length > 0) setThemes(message.results);
-                break;
-                case 'updateSearchState':
-                    console.log('New search state: ', message.value);
-                    updateConfig({ enableSearchBar: message.value });
-                break;
-                default: console.log('(Popup listener) Unknown message type');
-            }
-        } else {
-            console.log('(Popup listener) Wrong recepient or message type is not present');
-        }
-      }
-    );
+    });
+    
     console.log('Console log once');
   },[]);
-  
+
   const tabs = [
     {
       id: 'themes-tab-1',
@@ -90,7 +80,7 @@ export function App({getSearchWorker}: Props) {
   ];
 
   return (
-    <PopupContext.Provider value={{ config, themes, updateThemes, resetThemes }}>
+    <PopupContext.Provider value={{ config, themes, updateThemes, resetThemes, getSearchWorker }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>
