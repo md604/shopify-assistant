@@ -14,11 +14,9 @@ let indexShopifyThemes = new Document<ShopifyTheme, true>({
 // send a search query message function
 // add documents to the search index function
 function addShopifyThemesToIndex(themes:ShopifyTheme[]):void {
-        //const localThemes:ShopifyTheme[] = await getLocalThemes();
-        for(let i=0; i < themes.length; i++) {
-            console.log('Indexed theme: ', themes[i]);
-            indexShopifyThemes.add(themes[i]);
-        }
+    for(let i=0; i < themes.length; i++) {
+        indexShopifyThemes.add(themes[i]);
+    }
 }
 
 // get search results function

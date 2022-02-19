@@ -18,17 +18,22 @@ export function Themes() {
     }, []);
     const { config, resetThemes, getSearchWorker } = useContext(PopupContext);
 
-    useEffect(() => { 
-        if (getSearchWorker) {
-            const searchWorker = getSearchWorker();
-            searchWorker.postMessage(
-                {   
-                    type: 'searchQuery',
-                    query: filterQuery,
-                    to: 'sw'
-                }
-            );
-            console.log('You typed: ', filterQuery);
+    useEffect(() => {
+        if (filterQuery.length > 0) {
+            // todo: debounce search query sending
+            if (getSearchWorker) {
+                const searchWorker = getSearchWorker();
+                searchWorker.postMessage(
+                    {   
+                        type: 'searchQuery',
+                        query: filterQuery,
+                        to: 'sw'
+                    }
+                );
+                console.log('You typed: ', filterQuery);
+            }
+        } else {
+            resetThemes();
         }
     },[filterQuery]);
     

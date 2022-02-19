@@ -19,10 +19,14 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
                         let domainName:string = domainList[i];
                         const initDomainThemes = result[rootKey][domainName][shopsKey],
                             domainThemes:ShopifyTheme[] = initDomainThemes.map((theme:any) => {
+                                // compose a ShopifyTheme object based on raw and meta data from the storage 
                                 return {
                                     name: theme.name,
+                                    domainName,
+                                    lastUpdate: theme.updated_at,
                                     published: theme.role == 'main' ? true : false,
                                     developer: false,
+                                    pinned: false,
                                     id: theme.id,
                                 }
                             });

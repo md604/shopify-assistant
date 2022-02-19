@@ -12,8 +12,11 @@ export type Partial<T> = {
 // data representation for the popup UI
 export interface ShopifyTheme {
     name: string;
+    domainName: string;
+    lastUpdate: number;
     published: boolean;
     developer: boolean;
+    pinned: boolean;
     id: number;
 }
 

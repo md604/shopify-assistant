@@ -30,7 +30,7 @@ export function ThemesList() {
         <div style={{margin: '16px auto 0'}}>
             {
                 themes.length > 0 ?
-                themes.map((theme,i) => (
+                themes.map((theme, i) => (
                     <Card key={`${theme.id}-${i}`}>
                         <Card.Section>
                             <div style={{ width:'100%', display: 'flex' }}>
@@ -49,7 +49,7 @@ export function ThemesList() {
                                         <Heading>{theme.name}</Heading>
                                     </Stack>
                                     <TextContainer spacing="tight">
-                                        <p><TextStyle variation="subdued">vue-js-example.myshopify.com</TextStyle></p>
+                                        <p><TextStyle variation="subdued">{theme.domainName}</TextStyle></p>
                                     </TextContainer>
                                 </div>
                                 <div style={{ minWidth: '56px', textAlign: 'right' }}>
