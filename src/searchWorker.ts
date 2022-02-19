@@ -1,7 +1,5 @@
-import { Document, EnrichedDocumentSearchResultSetUnit, SimpleDocumentSearchResultSetUnit } from 'flexsearch';
-import { getLocalThemes } from './utils/storage';
+import { Document, EnrichedDocumentSearchResultSetUnit } from 'flexsearch';
 import { ShopifyTheme } from './utils/interfaces';
-import { storageUpdateOriginalThemesData } from './utils/storage';
 
 // search index is always defined and available
 let indexShopifyThemes = new Document<ShopifyTheme, true>({
@@ -15,11 +13,11 @@ let indexShopifyThemes = new Document<ShopifyTheme, true>({
 // receive a search query message function
 // send a search query message function
 // add documents to the search index function
-async function addShopifyThemesToIndex():Promise<void> {
-        const localThemes:ShopifyTheme[] = await getLocalThemes();
-        for(let i=0; i < localThemes.length; i++) {
-            console.log('Indexed theme: ', localThemes[i]);
-            indexShopifyThemes.add(localThemes[i]);
+function addShopifyThemesToIndex(themes:ShopifyTheme[]):void {
+        //const localThemes:ShopifyTheme[] = await getLocalThemes();
+        for(let i=0; i < themes.length; i++) {
+            console.log('Indexed theme: ', themes[i]);
+            indexShopifyThemes.add(themes[i]);
         }
 }
 
@@ -34,37 +32,25 @@ async function handleWorkerEvents(e:MessageEvent):Promise<void> {
     if (message.type) {
         switch (message.type) {
             case 'createSearchIndex':
-                //console.log('Docs in the index before adding: ', getIndexShopifyThemesEntriesNumber());
-                await addShopifyThemesToIndex();
-                //console.log('Docs in the index after adding: ', getIndexShopifyThemesEntriesNumber());
+                addShopifyThemesToIndex(message.themes);
                 self.postMessage(
                     {
-                        type: 'updateSearchState',
+                        type: 'enableSearchBar',
                         value: true,
                         to: 'popup'
                     }
                 );    
-            break;
-            case 'newThemes': 
-                // a message comes from the injected script that picks shopify themes
-                // console.log('Got a message of type THEMES', message.data);
-                storageUpdateOriginalThemesData({
-                    domainName: message.domainName,
-                    themes: message.data.themes ? message.data.themes : [] 
-                });
             break;
             case 'searchQuery':
                 const results:EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[] = await getSearchResults(message.query);
                 console.log('(background js) Got a search querry and results:', results);
                 if (results && results.length > 0) {
                     const themes:ShopifyTheme[] = [];
-                    
                     for(let i = 0; i < results.length; i++){
                         for(let j = 0; j < results[i].result.length; j++){
                             themes.push(results[i].result[j].doc);
                         }
                     }
-                    
                     self.postMessage(
                         {
                             type: 'searchResults',
@@ -80,8 +66,6 @@ async function handleWorkerEvents(e:MessageEvent):Promise<void> {
         console.log('Message type is not present');
     }
 }
-// add themes to index
-addShopifyThemesToIndex();
 
 // create event bus
 self.addEventListener('message', handleWorkerEvents);

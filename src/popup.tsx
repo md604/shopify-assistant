@@ -19,13 +19,6 @@ function getWorker():Worker {
   return searchWorker;
 }
 
-/*
-searchWorker.addEventListener('message', e => {
-  console.log(e.data);
-});
-searchWorker.postMessage('hello');
-*/
-
 ReactDOM.render(
   <AppProvider i18n={enTranslations}>
     <App getSearchWorker={getWorker} />

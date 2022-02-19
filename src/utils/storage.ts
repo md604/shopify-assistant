@@ -1,7 +1,6 @@
 import { 
     ShopifyTheme, 
-    StorageThemesData, 
-    SearchTheme 
+    StorageThemesData 
 } from './interfaces';
 
 export function getLocalThemes():Promise<ShopifyTheme[]> {
@@ -24,43 +23,6 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
                                     name: theme.name,
                                     published: theme.role == 'main' ? true : false,
                                     developer: false,
-                                    id: theme.id,
-                                }
-                            });
-                        allThemes = [...allThemes, ...domainThemes];
-                    }
-
-                    resolve(allThemes);
-                } else {
-                    console.log(`Can't find a root object "${rootKey}" in the storage (getLocalThemes function)`);
-                    resolve([]);
-                }
-            });
-        } catch (err) {
-            console.log('Local storage error: ', err);
-            reject([]);
-        }
-    });
-}
-
-export function getLocalSearchThemes():Promise<SearchTheme[]> {
-    return new Promise((resolve, reject) => {
-        try {
-            const rootKey:string = 'shops', shopsKey:string = 'themes';
-            chrome.storage.local.get(rootKey, function(result) {
-                if (chrome.runtime.lastError) {
-                    throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
-                } 
-                if (result && result[rootKey]) {
-                    let allThemes:SearchTheme[] = [];
-                    const domainList:string[] = Object.keys(result[rootKey]);
-                    
-                    for (let i:number = 0; i < domainList.length; i++) {
-                        let domainName:string = domainList[i];
-                        const initDomainThemes = result[rootKey][domainName][shopsKey],
-                            domainThemes:SearchTheme[] = initDomainThemes.map((theme:any) => {
-                                return {
-                                    name: theme.name,
                                     id: theme.id,
                                 }
                             });

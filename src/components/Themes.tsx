@@ -17,7 +17,6 @@ export function Themes() {
         console.log('Clear search query and show full theme list');
     }, []);
     const { config, resetThemes, getSearchWorker } = useContext(PopupContext);
-    //const [searchWorker, setSearchWorker] = useState<Worker>(getSearchWorker ? getSearchWorker() : );
 
     useEffect(() => { 
         if (getSearchWorker) {

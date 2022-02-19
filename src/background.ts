@@ -1,9 +1,4 @@
 import { storageUpdateOriginalThemesData } from './utils/storage';
-import { ShopifyTheme } from './utils/interfaces';
-import { getSearchResults, 
-    addShopifyThemesToIndex,
-    getIndexShopifyThemesEntriesNumber } from './utils/search';
-import { EnrichedDocumentSearchResultSetUnit } from 'flexsearch';
 
 const filter = {
     url: [
@@ -56,20 +51,6 @@ chrome.runtime.onMessage.addListener(
     async function(message, sender, sendResponse) {
         if (message.to == 'sw' && message.type) {
             switch (message.type) {
-                /*
-                case 'createSearchIndex':
-                    console.log('Docs in the index before adding: ', getIndexShopifyThemesEntriesNumber());
-                    await addShopifyThemesToIndex();
-                    console.log('Docs in the index after adding: ', getIndexShopifyThemesEntriesNumber());
-                    chrome.runtime.sendMessage(
-                        {
-                            type: 'updateSearchState',
-                            value: true,
-                            to: 'popup'
-                        }
-                    );    
-                break;
-                */
                 case 'newThemes': 
                     // a message comes from the injected script that picks shopify themes
                     console.log('Got a message of type THEMES', message.data);
@@ -78,29 +59,6 @@ chrome.runtime.onMessage.addListener(
                         themes: message.data.themes ? message.data.themes : [] 
                     });
                 break;
-                /*
-                case 'searchQuery':
-                    const results:EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[] = await getSearchResults(message.query);
-                    console.log('(background js) Got a search querry and results:', results);
-                    if (results && results.length > 0) {
-                        const themes:ShopifyTheme[] = [];
-                        
-                        for(let i = 0; i < results.length; i++){
-                            for(let j = 0; j < results[i].result.length; j++){
-                                themes.push(results[i].result[j].doc);
-                            }
-                        }
-                        
-                        chrome.runtime.sendMessage(
-                            {
-                                type: 'searchResults',
-                                results: themes,
-                                to: 'popup'
-                            }
-                        );    
-                    }
-                break;
-                */
                 default: console.log('Unknown message type');
             }
         } else {
@@ -128,9 +86,7 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 
 chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-        // create new search index
-        // await addShopifyThemesToIndex();
-        //console.log(ServiceWorker.state);
+        // do something after reloading extention
     }
     /*
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {

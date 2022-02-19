@@ -14,10 +14,7 @@ import { ShopifyTheme, AppConfig } from '../utils/interfaces';
 
 
 type Props = {
-  //state: string;
-  //setState: (val: string) => void;
   getSearchWorker: () => Worker;
-  //placeholder: string;
 };
 
 export function App({getSearchWorker}: Props) {
@@ -42,8 +39,6 @@ export function App({getSearchWorker}: Props) {
   
   // update context after mount
   useEffect(() => {
-    ( async () => setThemes(await getLocalThemes()) )();
-    
     searchWorker.addEventListener('message', async function(e) {
       const message = e.data;
       if (message.type) {
@@ -52,7 +47,7 @@ export function App({getSearchWorker}: Props) {
                   console.log('Search results: ', message.results);
                   if (message.results && message.results.length > 0) setThemes(message.results);
               break;
-              case 'updateSearchState':
+              case 'enableSearchBar':
                   console.log('New search state: ', message.value);
                   updateConfig({ enableSearchBar: message.value });
               break;
@@ -62,8 +57,19 @@ export function App({getSearchWorker}: Props) {
           console.log('(Popup listener) Wrong recepient or message type is not present');
       }
     });
-    
-    console.log('Console log once');
+
+    ( async () => {
+      const themes = await getLocalThemes();
+      // init popup themes
+      setThemes(themes);
+      // add themes to the search index
+      searchWorker.postMessage({   
+        type: 'createSearchIndex',
+        themes,
+        to: 'searchWorker'
+      });
+    } )();
+
   },[]);
 
   const tabs = [

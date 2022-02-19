@@ -21,35 +21,10 @@ import { LinkMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
 import { PopupContext } from './PopupContext';
-import { ShopifyTheme } from '../utils/interfaces';
-/*
-interface ThemesListProps {
-    themes: ShopifyTheme[];
-}
-{ themes }:ThemesListProps
-*/
-/*
- <ButtonGroup>
-    <Popover
-    active={false}
-    activator={
-        <Button disclosure icon={SettingsMajor}>
-            
-        </Button>
-    }
-    onClose={() => {}}
-    >
-        <ActionList 
-        actionRole="menuitem"
-        items={[{content: 'Tags'}, {content: 'Notes'}]} />
-    </Popover>
-    <Button icon={
-        <Icon source={PinMajor} />
-    }></Button>
-</ButtonGroup>
-*/
+//import { ShopifyTheme } from '../utils/interfaces';
+
 export function ThemesList() {
-    const [visibleThemes, setVisibleThemes] = useState([]);
+    //const [visibleThemes, setVisibleThemes] = useState([]);
     const { themes } = useContext(PopupContext);
     return (
         <div style={{margin: '16px auto 0'}}>

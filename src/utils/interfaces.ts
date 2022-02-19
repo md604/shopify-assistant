@@ -17,12 +17,6 @@ export interface ShopifyTheme {
     id: number;
 }
 
-// data representation for the search index
-export interface SearchTheme {
-    id: string;
-    name: string;
-}
-
 // data representaion of the raw data fetched via store API
 // /admin/themes.js
 export interface StorageThemesData {
