@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { Card, 
     Icon, 
     Badge,
@@ -11,7 +11,8 @@ import { Card,
     ButtonGroup,
     TextContainer,
     Caption,
-    TextStyle } from '@shopify/polaris';
+    TextStyle, 
+    BadgeProps} from '@shopify/polaris';
 import { LinkMinor, 
     ProductsMajor,
     NoteMajor,
@@ -21,16 +22,71 @@ import { LinkMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
 import { PopupContext } from './PopupContext';
+import { ShopifyTheme } from '../utils/interfaces';
 //import { ShopifyTheme } from '../utils/interfaces';
+
+function getLastUpdateMsg(t:number):string {
+    let msg = '';
+    const presentTime:number = Date.now(),
+        timeSinceLastUpdate:number = presentTime - t, 
+        ONE_DAY:number = 60 * 60 * 24,
+        TWO_DAYS:number = ONE_DAY * 2,
+        THREE_DAYS:number = ONE_DAY * 3,
+        options = {
+
+        };
+    if (timeSinceLastUpdate > THREE_DAYS) {
+        msg = `Updated ${new Intl.DateTimeFormat(
+            'default', 
+            {
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            }
+        ).format(t)}`;
+    } else if (timeSinceLastUpdate > ONE_DAY && timeSinceLastUpdate <= THREE_DAYS) {
+        msg = `Updated ${Math.round(timeSinceLastUpdate / ONE_DAY)} days ago`;
+    } else {
+        msg = `Updated at ${new Intl.DateTimeFormat(
+            'default', 
+            {
+                timeStyle: "short"
+            }
+        ).format(t)}`;
+    }
+    return msg;
+}
+
+function getBadgeProps(theme:ShopifyTheme):BadgeProps {
+    let status:BadgeProps['status'] = 'new',
+        children:BadgeProps['children'] = 'Live';
+
+    if (theme.published) {
+        status = 'success';
+    } else if (theme.developer) {
+        status = 'attention';
+        children = 'Dev';
+    }
+    return {
+        progress: theme.published ? 'complete' : 'incomplete',
+        status, 
+        children
+    };
+}
 
 export function ThemesList() {
     //const [visibleThemes, setVisibleThemes] = useState([]);
     const { themes } = useContext(PopupContext);
+    const handleViewBtnClick = useCallback(() => {
+        console.log('View btn click: ');
+    }, []);
     return (
         <div style={{margin: '16px auto 0'}}>
             {
                 themes.length > 0 ?
-                themes.map((theme, i) => (
+                themes.map((theme, i) => { 
+                    const badgeData:BadgeProps = getBadgeProps(theme);
+                    return (
                     <Card key={`${theme.id}-${i}`}>
                         <Card.Section>
                             <div style={{ width:'100%', display: 'flex' }}>
@@ -38,13 +94,12 @@ export function ThemesList() {
                                     <Stack vertical={true}>
                                         <Stack>
                                             <Badge
-                                                status="success"
-                                                progress="complete"
-                                                statusAndProgressLabelOverride="Status: Published. Your online store is visible."
-                                                >
-                                                Live
+                                                status={badgeData.status}
+                                                progress={badgeData.progress}
+                                            >
+                                                {badgeData.children}
                                             </Badge>
-                                            <TextStyle variation="subdued">Updated 3 days ago</TextStyle>
+                                            <TextStyle variation="subdued">{getLastUpdateMsg(theme.lastUpdate)}</TextStyle>
                                         </Stack>
                                         <Heading>{theme.name}</Heading>
                                     </Stack>
@@ -72,7 +127,9 @@ export function ThemesList() {
                         >
                             <Stack spacing="loose">
                                 <ButtonGroup segmented>
-                                    <Button>View</Button>
+                                    <Button
+                                    onClick={handleViewBtnClick}
+                                    >View</Button>
                                     <Button icon={
                                         <Icon source={ClipboardMinor} />
                                     }></Button>
@@ -115,7 +172,8 @@ export function ThemesList() {
                             <Button plain monochrome fullWidth>Show more options</Button>
                         </div>
                     </Card>
-                )) :
+                );
+                }) :
                 <div>There are no local themes</div>
             }
         </div>

@@ -23,7 +23,7 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
                                 return {
                                     name: theme.name,
                                     domainName,
-                                    lastUpdate: theme.updated_at,
+                                    lastUpdate: Date.parse(theme.updated_at),
                                     published: theme.role == 'main' ? true : false,
                                     developer: false,
                                     pinned: false,
