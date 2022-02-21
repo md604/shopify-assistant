@@ -21,7 +21,7 @@ import { LinkMinor,
     CircleTickMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
-import { PopupContext } from './PopupContext';
+//import { PopupContext } from './PopupContext';
 import { ShopifyTheme } from '../utils/interfaces';
 //import { ShopifyTheme } from '../utils/interfaces';
 
@@ -82,10 +82,13 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const [badgeData, setBadgeData] = useState<BadgeProps>(getBadgeProps(theme));
     const [lastUpdateMessage, setLastUpdateMessage] = useState<string>(getLastUpdateMsg(theme.lastUpdate));
     const handleViewBtnClick = useCallback(() => {
-        console.log('View btn click: ');
+        console.log('View btn click: ', theme.id);
+    }, []);
+    const handleSetupBtnClick = useCallback(() => {
+        console.log('Setup btn click: ', theme.id);
     }, []);
     return (
-        <Card key={`${theme.id}`}>
+        <Card>
             <Card.Section>
                 <div style={{ width:'100%', display: 'flex' }}>
                     <div style={{ maxWidth:'calc(100% - 56px)', width: '100%' }}>
@@ -136,7 +139,9 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                         }></Button>
                     </ButtonGroup>
                     <ButtonGroup segmented>
-                        <Button>Configure</Button>
+                        <Button
+                        onClick={handleSetupBtnClick}
+                        >Setup</Button>
                         <Button icon={
                             <Icon source={ClipboardMinor} />
                         }></Button>
