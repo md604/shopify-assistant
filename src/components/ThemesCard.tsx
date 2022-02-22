@@ -74,19 +74,78 @@ function getBadgeProps(theme:ShopifyTheme):BadgeProps {
     };
 }
 
+function getViewUrl(theme:ShopifyTheme):string {
+    return `https://${theme.domainName}?preview_theme_id=${theme.id}`;
+}
+
+function getSetupUrl(theme:ShopifyTheme):string {
+    return `https://${theme.domainName}/admin/themes/${theme.id}/editor`;
+}
+
+function setClipboard(text:string):void {
+    var type = "text/plain";
+    var blob = new Blob([text], { type });
+    var data = [new ClipboardItem({ [type]: blob })];
+
+    navigator.clipboard.write(data).then(
+        function () {
+        /* success */
+        },
+        function () {
+        /* failure */
+        }
+    );
+}
+
 type ThemesCardProps = {
     theme:ShopifyTheme;
 };
 
 export function ThemesCard({ theme }:ThemesCardProps) {
     const [badgeData, setBadgeData] = useState<BadgeProps>(getBadgeProps(theme));
+    const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false);
     const [lastUpdateMessage, setLastUpdateMessage] = useState<string>(getLastUpdateMsg(theme.lastUpdate));
+    // view btn
+    const [viewUrl, setViewUrl] = useState<string>(getViewUrl(theme)); 
     const handleViewBtnClick = useCallback(() => {
-        console.log('View btn click: ', theme.id);
+        console.log('Open view url in a new window: ', viewUrl);
+        chrome.tabs.create(
+            {
+                active: false,
+                url: viewUrl
+            }
+        );
     }, []);
+    const handleViewClipboardBtnClick = useCallback(() => {
+        setClipboard(viewUrl);
+        console.log('Copy view url to the clipboard: ', viewUrl);
+    }, []);
+    const handleViewQRcodeBtnClick = useCallback(() => {
+        console.log('Show QR code for the view url: ', viewUrl);
+    }, []);
+    // setup or configurer btn
+    const [setupUrl, setSetupUrl] = useState<string>(getSetupUrl(theme));
     const handleSetupBtnClick = useCallback(() => {
-        console.log('Setup btn click: ', theme.id);
+        console.log('Open setup url in a new window: ', setupUrl);
+        chrome.tabs.create(
+            {
+                active: false,
+                url: setupUrl
+            }
+        );
     }, []);
+    const handleSetupClipboardBtnClick = useCallback(() => {
+        setClipboard(setupUrl);
+        console.log('Copy setup url to the clipboard: ', setupUrl);
+    }, []);
+    const handleSetupQRcodeBtnClick = useCallback(() => {
+        console.log('Show QR code for the setup url: ', setupUrl);
+    }, []);
+    // show more
+    const handleShowMoreBtnClick = useCallback(() => {
+        setShowMoreOptions(!showMoreOptions);
+        console.log('Show all options', showMoreOptions);
+    }, [showMoreOptions]);
     return (
         <Card>
             <Card.Section>
@@ -131,10 +190,14 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                         <Button
                         onClick={handleViewBtnClick}
                         >View</Button>
-                        <Button icon={
+                        <Button 
+                        onClick={handleViewClipboardBtnClick}
+                        icon={
                             <Icon source={ClipboardMinor} />
                         }></Button>
-                        <Button icon={
+                        <Button 
+                        onClick={handleViewQRcodeBtnClick}
+                        icon={
                             <Icon source={ShopcodesMajor} />
                         }></Button>
                     </ButtonGroup>
@@ -142,16 +205,20 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                         <Button
                         onClick={handleSetupBtnClick}
                         >Setup</Button>
-                        <Button icon={
+                        <Button 
+                        onClick={handleSetupClipboardBtnClick}
+                        icon={
                             <Icon source={ClipboardMinor} />
                         }></Button>
-                        <Button icon={
+                        <Button 
+                        onClick={handleSetupQRcodeBtnClick}
+                        icon={
                             <Icon source={ShopcodesMajor} />
                         }></Button>
                     </ButtonGroup>
                 </Stack>
             </Card.Section>
-            { false && <Card.Section
+            { showMoreOptions && <Card.Section
                 title={
                 <Stack>
                     <Icon source={ProductsMajor} />
@@ -172,7 +239,9 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                 There are no notes
             </Card.Section>}
             <div style={{ background:'#efefef' }}>
-                <Button plain monochrome fullWidth>Show more options</Button>
+                <Button 
+                onClick={handleShowMoreBtnClick}
+                plain monochrome fullWidth>Show more options</Button>
             </div>
         </Card>
     );
