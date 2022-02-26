@@ -6,11 +6,12 @@ import { Card,
     Heading, 
     Subheading, 
     Popover,
-    ActionList,
+    Tag,
     Button,
     ButtonGroup,
     TextContainer,
-    Caption,
+    Form,
+    TextField,
     TextStyle, 
     BadgeProps} from '@shopify/polaris';
 import { LinkMinor, 
@@ -103,6 +104,9 @@ type ThemesCardProps = {
 
 export function ThemesCard({ theme }:ThemesCardProps) {
     const [badgeData, setBadgeData] = useState<BadgeProps>(getBadgeProps(theme));
+    const [tagPopoverActive, setTagPopoverActive] = useState<boolean>(false);
+    const [themeTags, setThemeTags] = useState<string[]>(['one', 'two']);
+    const [newTagValue, setNewTagValue] = useState<string>('');
     const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false);
     const [lastUpdateMessage, setLastUpdateMessage] = useState<string>(getLastUpdateMsg(theme.lastUpdate));
     // view btn
@@ -141,6 +145,22 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const handleSetupQRcodeBtnClick = useCallback(() => {
         console.log('Show QR code for the setup url: ', setupUrl);
     }, []);
+    // tags
+    const removeTag = useCallback((removeTagValue) => () => {
+        setThemeTags(themeTags.filter(currentTagValue => currentTagValue != removeTagValue));
+    }, [themeTags]);
+    const handleNewTagValueChange = useCallback((newValue) => {
+        setNewTagValue(newValue);
+    }, []);
+    const handleNewTagSubmit = useCallback(() => {
+        if (newTagValue.length > 1) setThemeTags([newTagValue, ...themeTags]);
+        console.log('Tag submitted: ', newTagValue, themeTags);
+        setNewTagValue('');
+        toggleTagPopoverActive();
+    }, [newTagValue]);
+    const toggleTagPopoverActive = useCallback(() => {
+        setTagPopoverActive(!tagPopoverActive);
+    }, [tagPopoverActive]);
     // show more
     const handleShowMoreBtnClick = useCallback(() => {
         setShowMoreOptions(!showMoreOptions);
@@ -176,12 +196,9 @@ export function ThemesCard({ theme }:ThemesCardProps) {
             </Card.Section>
             <Card.Section
                 title={
-                <Stack distribution="equalSpacing">
-                    <Stack>
-                        <Icon source={LinkMinor} />
-                        <Subheading>Links</Subheading>
-                    </Stack>
-                    <Button plain monochrome>Edit</Button>
+                <Stack>
+                    <Icon source={LinkMinor} />
+                    <Subheading>Links</Subheading>
                 </Stack>
                 }
             >
@@ -220,13 +237,47 @@ export function ThemesCard({ theme }:ThemesCardProps) {
             </Card.Section>
             { showMoreOptions && <Card.Section
                 title={
-                <Stack>
-                    <Icon source={ProductsMajor} />
-                    <Subheading>Tags</Subheading>
+                <Stack distribution="equalSpacing">
+                    <Stack>
+                        <Icon source={ProductsMajor} />
+                        <Subheading>Tags</Subheading>
+                    </Stack>
+                    <Popover
+                        active={tagPopoverActive}
+                        activator={
+                            <Button
+                            onClick={toggleTagPopoverActive} 
+                            plain 
+                            monochrome>Add</Button>
+                        }
+                        onClose={toggleTagPopoverActive}
+                        ariaHaspopup={false}
+                        sectioned
+                    >
+                        <Form onSubmit={handleNewTagSubmit}>
+                            <TextField
+                                label="Create new tag"
+                                labelHidden={true}
+                                value={newTagValue}
+                                onChange={handleNewTagValueChange}
+                                placeholder="Ex: GD"
+                                autoComplete="off"
+                            />
+                        </Form>
+                    </Popover>
                 </Stack>
                 }
             >
-                There are no tags
+                <Stack spacing="tight">
+                {
+                    themeTags.length > 0 ?
+                    themeTags.map((option) => (
+                        <Tag key={option} onRemove={removeTag(option)}>
+                          {option}
+                        </Tag>
+                    )) : <span>There are no tags</span>
+                }
+                </Stack>
             </Card.Section>}
             { false && <Card.Section
                 title={
