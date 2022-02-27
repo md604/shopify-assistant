@@ -12,7 +12,8 @@ import { Card,
     TextContainer,
     Form,
     TextField,
-    TextStyle, 
+    TextStyle,
+    Tooltip, 
     BadgeProps} from '@shopify/polaris';
 import { LinkMinor, 
     ProductsMajor,
@@ -105,10 +106,16 @@ type ThemesCardProps = {
 export function ThemesCard({ theme }:ThemesCardProps) {
     const [badgeData, setBadgeData] = useState<BadgeProps>(getBadgeProps(theme));
     const [tagPopoverActive, setTagPopoverActive] = useState<boolean>(false);
+    const [pinned, setPinned] = useState<boolean>(theme.pinned);
     const [themeTags, setThemeTags] = useState<string[]>(['one', 'two']);
     const [newTagValue, setNewTagValue] = useState<string>('');
     const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false);
     const [lastUpdateMessage, setLastUpdateMessage] = useState<string>(getLastUpdateMsg(theme.lastUpdate));
+    // pin btn
+    const togglePinBtnClick = useCallback(() => {
+        setPinned(!pinned);
+        console.log('Pin status: ', pinned);
+    }, [pinned]);
     // view btn
     const [viewUrl, setViewUrl] = useState<string>(getViewUrl(theme)); 
     const handleViewBtnClick = useCallback(() => {
@@ -187,8 +194,10 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                             <p><TextStyle variation="subdued">{theme.domainName}</TextStyle></p>
                         </TextContainer>
                     </div>
-                    <div style={{ minWidth: '56px', textAlign: 'right' }}>
-                        <Button icon={
+                    <div style={{ minWidth: '56px', textAlign: 'right' }} className={pinned ? 'pin-btn--active' : ''}>
+                        <Button 
+                        onClick={togglePinBtnClick}
+                        icon={
                             <Icon source={PinMajor} />
                         }></Button>
                     </div>
@@ -204,34 +213,46 @@ export function ThemesCard({ theme }:ThemesCardProps) {
             >
                 <Stack spacing="loose">
                     <ButtonGroup segmented>
-                        <Button
-                        onClick={handleViewBtnClick}
-                        >View</Button>
-                        <Button 
-                        onClick={handleViewClipboardBtnClick}
-                        icon={
-                            <Icon source={ClipboardMinor} />
-                        }></Button>
-                        <Button 
-                        onClick={handleViewQRcodeBtnClick}
-                        icon={
-                            <Icon source={ShopcodesMajor} />
-                        }></Button>
+                        <Tooltip content="Preview theme in a new tab">
+                            <Button
+                            onClick={handleViewBtnClick}
+                            >View</Button>
+                        </Tooltip>
+                        <Tooltip content="Copy URL into a clipboard">
+                            <Button 
+                            onClick={handleViewClipboardBtnClick}
+                            icon={
+                                <Icon source={ClipboardMinor} />
+                            }></Button>
+                        </Tooltip>
+                        <Tooltip content="Show QR code">
+                            <Button 
+                            onClick={handleViewQRcodeBtnClick}
+                            icon={
+                                <Icon source={ShopcodesMajor} />
+                            }></Button>
+                        </Tooltip>
                     </ButtonGroup>
                     <ButtonGroup segmented>
-                        <Button
-                        onClick={handleSetupBtnClick}
-                        >Setup</Button>
-                        <Button 
-                        onClick={handleSetupClipboardBtnClick}
-                        icon={
-                            <Icon source={ClipboardMinor} />
-                        }></Button>
-                        <Button 
-                        onClick={handleSetupQRcodeBtnClick}
-                        icon={
-                            <Icon source={ShopcodesMajor} />
-                        }></Button>
+                        <Tooltip content="Customize theme in a new tab">
+                            <Button
+                            onClick={handleSetupBtnClick}
+                            >Setup</Button>
+                        </Tooltip>
+                        <Tooltip content="Copy URL into a clipboard">
+                            <Button 
+                            onClick={handleSetupClipboardBtnClick}
+                            icon={
+                                <Icon source={ClipboardMinor} />
+                            }></Button>
+                        </Tooltip>
+                        <Tooltip content="Show QR code">
+                            <Button 
+                            onClick={handleSetupQRcodeBtnClick}
+                            icon={
+                                <Icon source={ShopcodesMajor} />
+                            }></Button>
+                        </Tooltip>
                     </ButtonGroup>
                 </Stack>
             </Card.Section>
@@ -256,7 +277,7 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                     >
                         <Form onSubmit={handleNewTagSubmit}>
                             <TextField
-                                label="Create new tag"
+                                label="Create a new tag"
                                 labelHidden={true}
                                 value={newTagValue}
                                 onChange={handleNewTagValueChange}
@@ -292,7 +313,9 @@ export function ThemesCard({ theme }:ThemesCardProps) {
             <div style={{ background:'#efefef' }}>
                 <Button 
                 onClick={handleShowMoreBtnClick}
-                plain monochrome fullWidth>Show more options</Button>
+                plain monochrome fullWidth>{
+                    showMoreOptions ? 'Hide options' : 'Show more options'
+                }</Button>
             </div>
         </Card>
     );

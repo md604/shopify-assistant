@@ -2,3 +2,8 @@ body {
     width: 400px;
     height: 600px;
 }
+.pin-btn--active {
+    svg {
+        fill: var(--p-icon-interactive);
+    }
+}
