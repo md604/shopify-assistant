@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState, useContext, useCallback, useRef, useEffect } from 'react';
 import { Card, 
     Icon, 
     Badge,
@@ -26,6 +26,7 @@ import { LinkMinor,
 //import { PopupContext } from './PopupContext';
 import { ShopifyTheme } from '../utils/interfaces';
 //import { ShopifyTheme } from '../utils/interfaces';
+import QRCode from 'qrcode';
 
 function getLastUpdateMsg(t:number):string {
     let msg = '';
@@ -106,6 +107,10 @@ type ThemesCardProps = {
 export function ThemesCard({ theme }:ThemesCardProps) {
     const [badgeData, setBadgeData] = useState<BadgeProps>(getBadgeProps(theme));
     const [tagPopoverActive, setTagPopoverActive] = useState<boolean>(false);
+    const viewQRCodeContainer = useRef<HTMLDivElement>(null);
+    const [viewQRCodePopoverActive, setViewQRCodePopoverActive] = useState<boolean>(false);
+    const setupQRCodeContainer = useRef<HTMLDivElement>(null);
+    const [setupQRCodePopoverActive, setSetupQRCodePopoverActive] = useState<boolean>(false);
     const [pinned, setPinned] = useState<boolean>(theme.pinned);
     const [themeTags, setThemeTags] = useState<string[]>(['one', 'two']);
     const [newTagValue, setNewTagValue] = useState<string>('');
@@ -131,9 +136,9 @@ export function ThemesCard({ theme }:ThemesCardProps) {
         setClipboard(viewUrl);
         console.log('Copy view url to the clipboard: ', viewUrl);
     }, []);
-    const handleViewQRcodeBtnClick = useCallback(() => {
-        console.log('Show QR code for the view url: ', viewUrl);
-    }, []);
+    const toggleViewQRCodePopoverActive = useCallback(() => {
+        setViewQRCodePopoverActive(!viewQRCodePopoverActive);
+    }, [viewQRCodePopoverActive]);
     // setup or configurer btn
     const [setupUrl, setSetupUrl] = useState<string>(getSetupUrl(theme));
     const handleSetupBtnClick = useCallback(() => {
@@ -149,9 +154,9 @@ export function ThemesCard({ theme }:ThemesCardProps) {
         setClipboard(setupUrl);
         console.log('Copy setup url to the clipboard: ', setupUrl);
     }, []);
-    const handleSetupQRcodeBtnClick = useCallback(() => {
-        console.log('Show QR code for the setup url: ', setupUrl);
-    }, []);
+    const toggleSetupQRCodePopoverActive = useCallback(() => {
+        setSetupQRCodePopoverActive(!setupQRCodePopoverActive);
+    }, [setupQRCodePopoverActive]);
     // tags
     const removeTag = useCallback((removeTagValue) => () => {
         setThemeTags(themeTags.filter(currentTagValue => currentTagValue != removeTagValue));
@@ -173,6 +178,29 @@ export function ThemesCard({ theme }:ThemesCardProps) {
         setShowMoreOptions(!showMoreOptions);
         console.log('Show all options', showMoreOptions);
     }, [showMoreOptions]);
+
+    useEffect(()=>{
+        if (setupQRCodePopoverActive && setupQRCodeContainer.current) {
+            try {
+                QRCode.toString( setupUrl, { type: 'svg' }, function (err, svg) {
+                    if (err) throw err;
+                    if (setupQRCodeContainer.current) setupQRCodeContainer.current.innerHTML = svg;
+                });
+            } catch (err) {
+                console.log('Problems with QR code: ', err);
+            }
+        }
+        if (viewQRCodePopoverActive && viewQRCodeContainer.current) {
+            try {
+                QRCode.toString( viewUrl, { type: 'svg' }, function (err, svg) {
+                    if (err) throw err;
+                    if (viewQRCodeContainer.current) viewQRCodeContainer.current.innerHTML = svg;
+                });
+            } catch (err) {
+                console.log('Problems with QR code: ', err);
+            }
+        }
+    },[setupQRCodePopoverActive, viewQRCodePopoverActive]);
     return (
         <Card>
             <Card.Section>
@@ -225,13 +253,29 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                                 <Icon source={ClipboardMinor} />
                             }></Button>
                         </Tooltip>
-                        <Tooltip content="Show QR code">
-                            <Button 
-                            onClick={handleViewQRcodeBtnClick}
-                            icon={
-                                <Icon source={ShopcodesMajor} />
-                            }></Button>
-                        </Tooltip>
+                        <Popover
+                            active={viewQRCodePopoverActive}
+                            activator={
+                                <Tooltip content="Show QR code">
+                                    <Button 
+                                    onClick={toggleViewQRCodePopoverActive}
+                                    icon={
+                                        <Icon source={ShopcodesMajor} />
+                                    }></Button>
+                                </Tooltip>
+                            }
+                            onClose={toggleViewQRCodePopoverActive}
+                            ariaHaspopup={false}
+                            sectioned
+                        >
+                            <Stack vertical={true}>
+                                <div ref={viewQRCodeContainer} 
+                                style={{ width:'200px', height:'200px', background: 'green' }}></div>
+                                <Button 
+                                onClick={handleShowMoreBtnClick}
+                                plain monochrome fullWidth>Copy to clipboard</Button> 
+                            </Stack> 
+                        </Popover>
                     </ButtonGroup>
                     <ButtonGroup segmented>
                         <Tooltip content="Customize theme in a new tab">
@@ -246,13 +290,29 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                                 <Icon source={ClipboardMinor} />
                             }></Button>
                         </Tooltip>
-                        <Tooltip content="Show QR code">
-                            <Button 
-                            onClick={handleSetupQRcodeBtnClick}
-                            icon={
-                                <Icon source={ShopcodesMajor} />
-                            }></Button>
-                        </Tooltip>
+                        <Popover
+                            active={setupQRCodePopoverActive}
+                            activator={
+                                <Tooltip content="Show QR code">
+                                    <Button 
+                                    onClick={toggleSetupQRCodePopoverActive}
+                                    icon={
+                                        <Icon source={ShopcodesMajor} />
+                                    }></Button>
+                                </Tooltip>
+                            }
+                            onClose={toggleSetupQRCodePopoverActive}
+                            ariaHaspopup={false}
+                            sectioned
+                        >
+                            <Stack vertical={true}>
+                                <div ref={setupQRCodeContainer} 
+                                style={{ width:'200px', height:'200px', background: 'green' }}></div>
+                                <Button 
+                                onClick={handleShowMoreBtnClick}
+                                plain monochrome fullWidth>Copy to clipboard</Button> 
+                            </Stack> 
+                        </Popover>
                     </ButtonGroup>
                 </Stack>
             </Card.Section>
