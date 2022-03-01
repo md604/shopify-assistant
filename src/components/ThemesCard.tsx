@@ -100,6 +100,17 @@ function setClipboard(text:string):void {
     );
 }
 
+function createQRCode(url:string,svgContainer:HTMLDivElement) {
+    try {
+        QRCode.toString( url, { type: 'svg' }, function (err, svg) {
+            if (err) throw err;
+            if (svgContainer) svgContainer.innerHTML = svg;
+        });
+    } catch (err) {
+        console.log('Problems with QR code: ', err);
+    }
+}
+
 type ThemesCardProps = {
     theme:ShopifyTheme;
 };
@@ -181,26 +192,13 @@ export function ThemesCard({ theme }:ThemesCardProps) {
 
     useEffect(()=>{
         if (setupQRCodePopoverActive && setupQRCodeContainer.current) {
-            try {
-                QRCode.toString( setupUrl, { type: 'svg' }, function (err, svg) {
-                    if (err) throw err;
-                    if (setupQRCodeContainer.current) setupQRCodeContainer.current.innerHTML = svg;
-                });
-            } catch (err) {
-                console.log('Problems with QR code: ', err);
-            }
+            createQRCode(setupUrl, setupQRCodeContainer.current);
         }
         if (viewQRCodePopoverActive && viewQRCodeContainer.current) {
-            try {
-                QRCode.toString( viewUrl, { type: 'svg' }, function (err, svg) {
-                    if (err) throw err;
-                    if (viewQRCodeContainer.current) viewQRCodeContainer.current.innerHTML = svg;
-                });
-            } catch (err) {
-                console.log('Problems with QR code: ', err);
-            }
+            createQRCode(viewUrl, viewQRCodeContainer.current);
         }
     },[setupQRCodePopoverActive, viewQRCodePopoverActive]);
+
     return (
         <Card>
             <Card.Section>
@@ -271,9 +269,11 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                             <Stack vertical={true}>
                                 <div ref={viewQRCodeContainer} 
                                 style={{ width:'200px', height:'200px', background: 'green' }}></div>
+                                {/* 
                                 <Button 
                                 onClick={handleShowMoreBtnClick}
-                                plain monochrome fullWidth>Copy to clipboard</Button> 
+                                plain monochrome fullWidth>Copy to clipboard</Button>
+                                */} 
                             </Stack> 
                         </Popover>
                     </ButtonGroup>
@@ -308,9 +308,11 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                             <Stack vertical={true}>
                                 <div ref={setupQRCodeContainer} 
                                 style={{ width:'200px', height:'200px', background: 'green' }}></div>
+                                {/*
                                 <Button 
                                 onClick={handleShowMoreBtnClick}
                                 plain monochrome fullWidth>Copy to clipboard</Button> 
+                                */}
                             </Stack> 
                         </Popover>
                     </ButtonGroup>

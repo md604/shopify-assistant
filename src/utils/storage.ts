@@ -3,6 +3,30 @@ import {
     StorageThemesData 
 } from './interfaces';
 
+/*
+Storage model:
+{
+    shops: {
+        'xxx.myshopify.com': {
+            themes: [
+                { theme_1 obj - raw shopify data }, 
+                { theme_2 obj - raw shopify data },
+                ...
+            ],
+            themesMeta: {
+                'theme_1_id': {
+                    available: boolean,
+                    tags: ['tag1', 'tag2', 'tag3', ...],
+                    notes:[], <-- reserved for future versions
+                    links:[]  <-- reserved for future versions
+                },
+                'theme_2_id': {...}
+            }
+        }
+    }
+}
+*/
+
 export function getLocalThemes():Promise<ShopifyTheme[]> {
     return new Promise((resolve, reject) => {
         try {
@@ -56,7 +80,8 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
 
         let shop = { [domainName]: { themes } }, 
             shops = {};
-
+        // 1. create a list of fetched theme ids from a shopify site
+        // 2. mark store themes that do not exist in fetch results as not available (aka 'gone')
         if (result && result['shops'] && result['shops'][domainName]) {
             shop[domainName] = {...result['shops'][domainName], ...shop[domainName]};
         } 
