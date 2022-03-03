@@ -80,11 +80,27 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
 
         let shop = { [domainName]: { themes } }, 
             shops = {};
-        // 1. create a list of fetched theme ids from a shopify site
-        // 2. mark store themes that do not exist in fetch results as not available (aka 'gone')
+        
         if (result && result['shops'] && result['shops'][domainName]) {
-            shop[domainName] = {...result['shops'][domainName], ...shop[domainName]};
-        } 
+            const storeShop:any = result['shops'][domainName];
+            // 1. create a list of fetched theme ids from a shopify site
+            const newThemesIds: string[] = themes.map((theme:any) => theme.id);
+            const storeThemesIds: string[] = Object.keys(storeShop['themes']);
+            // 2. mark store themes that do not exist in fetch results as not available (aka 'gone')
+            //    first mark all themes as outdated / unavailable
+            //    then mark new themes as actual ones / available
+            if (storeShop['themesMeta'] === undefined) {
+                storeShop['themesMeta'] = {};
+            }
+            for(let i = 0; i < storeThemesIds.length; i++) {
+                storeShop['themesMeta'][storeThemesIds[i]]['available'] = false;
+            }
+            for(let i = 0; i < newThemesIds.length; i++) {
+                storeShop['themesMeta'][newThemesIds[i]]['available'] = true;
+            }
+            // merge existing store themes and new themes
+            shop[domainName] = {...storeShop, ...shop[domainName]};
+        }
 
         shops = { ...result['shops'], ...shop };
 
