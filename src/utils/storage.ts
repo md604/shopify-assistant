@@ -1,6 +1,8 @@
 import { 
     ShopifyTheme, 
-    StorageThemesData 
+    StorageThemesData,
+    ThemeMeta,
+    defaultThemeMeta 
 } from './interfaces';
 
 /*
@@ -30,20 +32,33 @@ Storage model:
 export function getLocalThemes():Promise<ShopifyTheme[]> {
     return new Promise((resolve, reject) => {
         try {
-            const rootKey:string = 'shops', shopsKey:string = 'themes';
-            chrome.storage.local.get(rootKey, function(result) {
+            const shopsKey:string = 'shops', 
+                shopThemesKey:string = 'themes', 
+                shopThemesMetaKey:string = 'themesMeta',
+                defaultThemeMeta:ThemeMeta = {
+                    available: false,
+                    tags: []
+                };
+            chrome.storage.local.get(shopsKey, function(result) {
                 if (chrome.runtime.lastError) {
                     throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
                 } 
-                if (result && result[rootKey]) {
+                if (result && result[shopsKey]) {
                     let allThemes:ShopifyTheme[] = [];
-                    const domainList:string[] = Object.keys(result[rootKey]);
+                    const domainList:string[] = Object.keys(result[shopsKey]);
                     
                     for (let i:number = 0; i < domainList.length; i++) {
                         let domainName:string = domainList[i];
-                        const initDomainThemes = result[rootKey][domainName][shopsKey],
+                        result[shopsKey][domainName][shopThemesMetaKey] ??= {};
+
+                        const domainThemesMeta = result[shopsKey][domainName][shopThemesMetaKey], 
+                            initDomainThemes = result[shopsKey][domainName][shopThemesKey],
                             domainThemes:ShopifyTheme[] = initDomainThemes.map((theme:any) => {
                                 // compose a ShopifyTheme object based on raw and meta data from the storage 
+                                const themeMeta:ThemeMeta = domainThemesMeta[theme.id] ? 
+                                    domainThemesMeta[theme.id]
+                                    :
+                                    defaultThemeMeta;
                                 return {
                                     name: theme.name,
                                     domainName,
@@ -52,6 +67,8 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
                                     developer: false,
                                     pinned: false,
                                     id: theme.id,
+                                    available: themeMeta['available'],
+                                    tags: themeMeta['tags']
                                 }
                             });
                         allThemes = [...allThemes, ...domainThemes];
@@ -59,7 +76,7 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
 
                     resolve(allThemes);
                 } else {
-                    console.log(`Can't find a root object "${rootKey}" in the storage (getLocalThemes function)`);
+                    console.log(`Can't find a root object "${shopsKey}" in the storage (getLocalThemes function)`);
                     resolve([]);
                 }
             });
@@ -89,13 +106,14 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
             // 2. mark store themes that do not exist in fetch results as not available (aka 'gone')
             //    first mark all themes as outdated / unavailable
             //    then mark new themes as actual ones / available
-            if (storeShop['themesMeta'] === undefined) {
-                storeShop['themesMeta'] = {};
-            }
+            //    complexity: O(2n)
+            storeShop['themesMeta'] ??= {};
             for(let i = 0; i < storeThemesIds.length; i++) {
+                storeShop['themesMeta'][storeThemesIds[i]] ??= {};
                 storeShop['themesMeta'][storeThemesIds[i]]['available'] = false;
             }
             for(let i = 0; i < newThemesIds.length; i++) {
+                storeShop['themesMeta'][storeThemesIds[i]] ??= {};
                 storeShop['themesMeta'][newThemesIds[i]]['available'] = true;
             }
             // merge existing store themes and new themes
@@ -114,6 +132,16 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
         });
     });
     return storageUpdateResult;
+}
+
+export function storageUpdateThemeMetaData(
+    domainName: ShopifyTheme['domainName'], 
+    themeId:ShopifyTheme['id'], 
+    metaData: Partial<ThemeMeta>):Promise<ThemeMeta> {
+
+    return new Promise((resolve,reject) => {
+        resolve(defaultThemeMeta);
+    });
 }
 
 export default {}

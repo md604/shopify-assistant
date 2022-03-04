@@ -69,9 +69,12 @@ function getBadgeProps(theme:ShopifyTheme):BadgeProps {
     } else if (theme.developer) {
         status = 'attention';
         children = 'Dev';
+    } else if (!theme.available) {
+        status = 'critical';
+        children = 'Gone';
     }
     return {
-        progress: theme.published ? 'complete' : 'incomplete',
+        progress: theme.published || !theme.available ? 'complete' : 'incomplete',
         status, 
         children
     };
@@ -123,7 +126,7 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const setupQRCodeContainer = useRef<HTMLDivElement>(null);
     const [setupQRCodePopoverActive, setSetupQRCodePopoverActive] = useState<boolean>(false);
     const [pinned, setPinned] = useState<boolean>(theme.pinned);
-    const [themeTags, setThemeTags] = useState<string[]>(['one', 'two']);
+    const [themeTags, setThemeTags] = useState<string[]>(theme.tags);
     const [newTagValue, setNewTagValue] = useState<string>('');
     const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false);
     const [lastUpdateMessage, setLastUpdateMessage] = useState<string>(getLastUpdateMsg(theme.lastUpdate));
