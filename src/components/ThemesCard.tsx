@@ -24,7 +24,7 @@ import { LinkMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
 //import { PopupContext } from './PopupContext';
-import { ShopifyTheme } from '../utils/interfaces';
+import { ShopifyTheme, ThemeMeta } from '../utils/interfaces';
 //import { ShopifyTheme } from '../utils/interfaces';
 import QRCode from 'qrcode';
 
@@ -173,13 +173,40 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     }, [setupQRCodePopoverActive]);
     // tags
     const removeTag = useCallback((removeTagValue) => () => {
-        setThemeTags(themeTags.filter(currentTagValue => currentTagValue != removeTagValue));
+        //setThemeTags(themeTags.filter(currentTagValue => currentTagValue != removeTagValue));
+        const updatedTags: string[] = themeTags.filter(currentTagValue => currentTagValue != removeTagValue);
+        const updatedTheme: ShopifyTheme = { ...theme };
+        updatedTheme.tags = updatedTags;
+        // save localy
+        setThemeTags(updatedTags);
+        // save to store
+        chrome.runtime.sendMessage({
+            type: 'updateThemeMeta',
+            data: {
+                theme: updatedTheme
+            },
+            to: 'sw'
+        });
     }, [themeTags]);
     const handleNewTagValueChange = useCallback((newValue) => {
         setNewTagValue(newValue);
     }, []);
     const handleNewTagSubmit = useCallback(() => {
-        if (newTagValue.length > 1) setThemeTags([newTagValue, ...themeTags]);
+        if (newTagValue.length > 1) {
+            const updatedTags: string[] = [newTagValue, ...themeTags];
+            const updatedTheme: ShopifyTheme = { ...theme };
+            updatedTheme.tags = updatedTags;
+            // save localy
+            setThemeTags(updatedTags);
+            // save to store
+            chrome.runtime.sendMessage({
+                type: 'updateThemeMeta',
+                data: {
+                    theme: updatedTheme
+                },
+                to: 'sw'
+            });
+        } 
         console.log('Tag submitted: ', newTagValue, themeTags);
         setNewTagValue('');
         toggleTagPopoverActive();

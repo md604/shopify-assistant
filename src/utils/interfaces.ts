@@ -12,13 +12,13 @@ export interface ThemeMeta {
     available: boolean;
     tags: string[];
 }
-export const defaultThemeMeta = {
+export const defaultThemeMeta: ThemeMeta = {
     available: false,
     tags: []
 };
 
 // data representation for the popup UI
-export interface ShopifyTheme {
+export interface ShopifyTheme extends ThemeMeta {
     name: string;
     domainName: string;
     lastUpdate: number;
@@ -26,10 +26,8 @@ export interface ShopifyTheme {
     developer: boolean;
     pinned: boolean;
     id: number;
-    available: ThemeMeta['available'];
-    tags: ThemeMeta['tags'];
 }
-export const defaultShopifyTheme = {
+export const defaultShopifyTheme: ShopifyTheme = {
     name: 'Default theme name',
     domainName: '',
     lastUpdate: 0,

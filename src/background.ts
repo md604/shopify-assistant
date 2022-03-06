@@ -1,4 +1,7 @@
-import { storageUpdateOriginalThemesData } from './utils/storage';
+import { 
+    storageUpdateOriginalThemesData, 
+    storageUpdateThemeMetaData
+} from './utils/storage';
 
 const filter = {
     url: [
@@ -58,6 +61,11 @@ chrome.runtime.onMessage.addListener(
                         domainName: message.domainName,
                         themes: message.data.themes ? message.data.themes : [] 
                     });
+                break;
+                case 'updateThemeMeta': 
+                    // a message comes from the injected script that picks shopify themes
+                    console.log('Got a message of type ShopifyTheme', message.data);
+                    storageUpdateThemeMetaData(message.data.theme ? message.data.theme : {});
                 break;
                 default: console.log('Unknown message type');
             }

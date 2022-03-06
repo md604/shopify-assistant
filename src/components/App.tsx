@@ -82,6 +82,11 @@ export function App({getSearchWorker}: Props) {
       id: 'themes-tab-2',
       content: 'Pinned themes',
       panelID: 'themes-tab-content-2',
+    },
+    {
+      id: 'themes-tab-3',
+      content: 'Gone',
+      panelID: 'themes-tab-content-3',
     }
   ];
 
