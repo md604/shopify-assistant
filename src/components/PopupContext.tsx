@@ -11,7 +11,8 @@ export interface ContextState {
 }
 
 export const initAppConfig:AppConfig = {
-    enableSearchBar: false
+    enableSearchBar: false,
+    tabFilterThemeProperty: {}
 };
 
 export const PopupContext = React.createContext<ContextState>({

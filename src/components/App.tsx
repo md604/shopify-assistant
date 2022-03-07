@@ -72,6 +72,20 @@ export function App({getSearchWorker}: Props) {
 
   },[]);
 
+  useEffect(()=> {
+    let tabFilter: Partial<ShopifyTheme> = {};
+    switch (tabs[selected].id) {
+      case 'themes-tab-2':
+        tabFilter = { pinned: true }; 
+      break;
+      case 'themes-tab-3':
+        tabFilter = { available: false }; 
+      break;
+    }
+    updateConfig({ tabFilterThemeProperty: tabFilter });
+    console.log('Select tab');
+  },[selected]);
+
   const tabs = [
     {
       id: 'themes-tab-1',

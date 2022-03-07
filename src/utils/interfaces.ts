@@ -1,6 +1,7 @@
 // global app config
 export interface AppConfig {
     enableSearchBar: boolean;
+    tabFilterThemeProperty: Partial<ShopifyTheme>;
 }
 
 /*
