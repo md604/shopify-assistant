@@ -10,10 +10,12 @@ export type Partial<T> = {
 }
 */
 export interface ThemeMeta {
+    pinned: boolean;
     available: boolean;
     tags: string[];
 }
 export const defaultThemeMeta: ThemeMeta = {
+    pinned: false,
     available: false,
     tags: []
 };
@@ -25,7 +27,6 @@ export interface ShopifyTheme extends ThemeMeta {
     lastUpdate: number;
     published: boolean;
     developer: boolean;
-    pinned: boolean;
     id: number;
 }
 export const defaultShopifyTheme: ShopifyTheme = {

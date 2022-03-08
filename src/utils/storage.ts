@@ -65,8 +65,8 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
                                     lastUpdate: Date.parse(theme.updated_at),
                                     published: theme.role == 'main' ? true : false,
                                     developer: false,
-                                    pinned: false,
                                     id: theme.id,
+                                    pinned: themeMeta['pinned'],
                                     available: themeMeta['available'],
                                     tags: themeMeta['tags']
                                 }

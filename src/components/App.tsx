@@ -110,7 +110,7 @@ export function App({getSearchWorker}: Props) {
         <Layout.Section>
           <Card sectioned>
             <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
-              <Themes/>
+              <Themes key={tabs[selected].id}/>
             </Tabs>
           </Card>
         </Layout.Section>

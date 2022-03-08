@@ -15,9 +15,11 @@ export function ThemesList() {
                 filterValue = config.tabFilterThemeProperty[filterKey as keyof ShopifyTheme],
                 filterThemesResult = themes.filter(theme => theme[filterKey as keyof ShopifyTheme] == filterValue);
             setFilteredThemes(filterThemesResult);
+        } else {
+            setFilteredThemes(themes);
         }
-        console.log('Config value: ', config, themes);
-    },[themes, config.tabFilterThemeProperty]);
+        console.log('Config value: ', config, filteredThemes, themes);
+    },[config]);
     return (
         <div style={{margin: '16px auto 0'}}>
             {
