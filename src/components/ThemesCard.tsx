@@ -114,6 +114,18 @@ function createQRCode(url:string,svgContainer:HTMLDivElement) {
     }
 }
 
+function storeUpdateThemeMeta(theme:ShopifyTheme, metaProps: Partial<ThemeMeta>) {
+    const updatedTheme: ShopifyTheme = { ...theme, ...metaProps };
+    // save to store
+    chrome.runtime.sendMessage({
+        type: 'updateThemeMeta',
+        data: {
+            theme: updatedTheme
+        },
+        to: 'sw'
+    });
+}
+
 type ThemesCardProps = {
     theme:ShopifyTheme;
 };
@@ -125,13 +137,17 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const [viewQRCodePopoverActive, setViewQRCodePopoverActive] = useState<boolean>(false);
     const setupQRCodeContainer = useRef<HTMLDivElement>(null);
     const [setupQRCodePopoverActive, setSetupQRCodePopoverActive] = useState<boolean>(false);
+    const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false);
+    const [lastUpdateMessage, setLastUpdateMessage] = useState<string>(getLastUpdateMsg(theme.lastUpdate));
+    // theme meta data
     const [pinned, setPinned] = useState<boolean>(theme.pinned);
     const [themeTags, setThemeTags] = useState<string[]>(theme.tags);
     const [newTagValue, setNewTagValue] = useState<string>('');
-    const [showMoreOptions, setShowMoreOptions] = useState<boolean>(false);
-    const [lastUpdateMessage, setLastUpdateMessage] = useState<string>(getLastUpdateMsg(theme.lastUpdate));
     // pin btn
     const togglePinBtnClick = useCallback(() => {
+        // save to store
+        storeUpdateThemeMeta(theme, { pinned: !pinned, tags: themeTags});
+        // save localy
         setPinned(!pinned);
         console.log('Pin status: ', pinned);
     }, [pinned]);
@@ -194,18 +210,10 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const handleNewTagSubmit = useCallback(() => {
         if (newTagValue.length > 1) {
             const updatedTags: string[] = [newTagValue, ...themeTags];
-            const updatedTheme: ShopifyTheme = { ...theme };
-            updatedTheme.tags = updatedTags;
+            // save to store
+            storeUpdateThemeMeta(theme, { pinned, tags: updatedTags});
             // save localy
             setThemeTags(updatedTags);
-            // save to store
-            chrome.runtime.sendMessage({
-                type: 'updateThemeMeta',
-                data: {
-                    theme: updatedTheme
-                },
-                to: 'sw'
-            });
         } 
         console.log('Tag submitted: ', newTagValue, themeTags);
         setNewTagValue('');
