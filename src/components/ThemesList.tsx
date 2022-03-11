@@ -1,25 +1,27 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { ShopifyTheme } from '../utils/interfaces';
+import React, { useState, useContext, useEffect, useMemo } from 'react';
+import { AppConfig, ShopifyTheme } from '../utils/interfaces';
 //import { Card } from '@shopify/polaris';
 import { PopupContext } from './PopupContext';
 //import { ShopifyTheme } from '../utils/interfaces';
 import { ThemesCard } from './ThemesCard';
 
+function getFilteredThemes(themes:ShopifyTheme[],config:AppConfig):ShopifyTheme[] {
+    const tabFilterProps = Object.keys(config.tabFilterThemeProperty);
+    let result:ShopifyTheme[] = themes;
+    
+    if (tabFilterProps.length > 0){
+        const filterKey = tabFilterProps[0],
+            filterValue = config.tabFilterThemeProperty[filterKey as keyof ShopifyTheme];
+        result = themes.filter(theme => theme[filterKey as keyof ShopifyTheme] == filterValue);
+    } 
+    console.log('Config value: ', config, themes, result);
+    
+    return result;
+}
+
 export function ThemesList() {
     const { themes, config } = useContext(PopupContext);
-    const [filteredThemes, setFilteredThemes] = useState(themes);
-    useEffect(() => {
-        const tabFilterProps = Object.keys(config.tabFilterThemeProperty);
-        if (tabFilterProps.length > 0){
-            const filterKey = tabFilterProps[0],
-                filterValue = config.tabFilterThemeProperty[filterKey as keyof ShopifyTheme],
-                filterThemesResult = themes.filter(theme => theme[filterKey as keyof ShopifyTheme] == filterValue);
-            setFilteredThemes(filterThemesResult);
-        } else {
-            setFilteredThemes(themes);
-        }
-        console.log('Config value: ', config, filteredThemes, themes);
-    },[config]);
+    const filteredThemes = useMemo(() => getFilteredThemes(themes, config), [themes, config]);
     return (
         <div style={{margin: '16px auto 0'}}>
             {

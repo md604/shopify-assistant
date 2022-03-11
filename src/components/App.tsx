@@ -25,6 +25,15 @@ export function App({getSearchWorker}: Props) {
 
   //context methods and hooks
   const [themes, setThemes] = useState<ShopifyTheme[]>([]);
+  
+  const updateTheme = (newTheme:ShopifyTheme) => {
+    const updatedThemes:ShopifyTheme[] = themes.map(theme => {
+      if (theme.id == newTheme.id) return newTheme; 
+      return theme;
+    });
+    setThemes(updatedThemes);
+  }
+  
   const updateThemes = (newThemes:ShopifyTheme[]) => {
     setThemes(newThemes);
   }
@@ -105,7 +114,7 @@ export function App({getSearchWorker}: Props) {
   ];
 
   return (
-    <PopupContext.Provider value={{ config, themes, updateThemes, resetThemes, getSearchWorker }}>
+    <PopupContext.Provider value={{ config, themes, updateTheme, updateThemes, resetThemes, getSearchWorker }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>

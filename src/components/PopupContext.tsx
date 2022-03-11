@@ -6,6 +6,7 @@ export interface ContextState {
     config: AppConfig;
     themes: ShopifyTheme[];
     getSearchWorker?: () => Worker;
+    updateTheme: (newTheme:ShopifyTheme) => void;
     updateThemes: (newThemes:ShopifyTheme[]) => void;
     resetThemes: () => void;
 }
@@ -18,6 +19,7 @@ export const initAppConfig:AppConfig = {
 export const PopupContext = React.createContext<ContextState>({
     config: initAppConfig,
     themes: [],
+    updateTheme: () => {},
     updateThemes: () => {},
     resetThemes: () => {}
 });

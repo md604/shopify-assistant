@@ -23,9 +23,8 @@ import { LinkMinor,
     CircleTickMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
-//import { PopupContext } from './PopupContext';
+import { PopupContext } from './PopupContext';
 import { ShopifyTheme, ThemeMeta } from '../utils/interfaces';
-//import { ShopifyTheme } from '../utils/interfaces';
 import QRCode from 'qrcode';
 
 function getLastUpdateMsg(t:number):string {
@@ -131,6 +130,7 @@ type ThemesCardProps = {
 };
 
 export function ThemesCard({ theme }:ThemesCardProps) {
+    const { updateTheme } = useContext(PopupContext);
     const [badgeData, setBadgeData] = useState<BadgeProps>(getBadgeProps(theme));
     const [tagPopoverActive, setTagPopoverActive] = useState<boolean>(false);
     const viewQRCodeContainer = useRef<HTMLDivElement>(null);
@@ -145,12 +145,14 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const [newTagValue, setNewTagValue] = useState<string>('');
     // pin btn
     const togglePinBtnClick = useCallback(() => {
+        //const currentPinned = pinned;
         // save to store
-        storeUpdateThemeMeta(theme, { pinned: !pinned, tags: themeTags});
+        //storeUpdateThemeMeta(theme, { pinned: !currentPinned, tags: themeTags});
+        //updateTheme({...theme, pinned: !pinned, tags: themeTags});
         // save localy
         setPinned(!pinned);
         console.log('Pin status: ', pinned);
-    }, [pinned]);
+    }, []);
     // view btn
     const [viewUrl, setViewUrl] = useState<string>(getViewUrl(theme)); 
     const handleViewBtnClick = useCallback(() => {
@@ -191,11 +193,12 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const removeTag = useCallback((removeTagValue) => () => {
         //setThemeTags(themeTags.filter(currentTagValue => currentTagValue != removeTagValue));
         const updatedTags: string[] = themeTags.filter(currentTagValue => currentTagValue != removeTagValue);
-        const updatedTheme: ShopifyTheme = { ...theme };
-        updatedTheme.tags = updatedTags;
+        //const updatedTheme: ShopifyTheme = { ...theme };
+        //updatedTheme.tags = updatedTags;
         // save localy
         setThemeTags(updatedTags);
         // save to store
+        /*
         chrome.runtime.sendMessage({
             type: 'updateThemeMeta',
             data: {
@@ -203,6 +206,7 @@ export function ThemesCard({ theme }:ThemesCardProps) {
             },
             to: 'sw'
         });
+        */
     }, [themeTags]);
     const handleNewTagValueChange = useCallback((newValue) => {
         setNewTagValue(newValue);
@@ -211,7 +215,7 @@ export function ThemesCard({ theme }:ThemesCardProps) {
         if (newTagValue.length > 1) {
             const updatedTags: string[] = [newTagValue, ...themeTags];
             // save to store
-            storeUpdateThemeMeta(theme, { pinned, tags: updatedTags});
+            //storeUpdateThemeMeta(theme, { pinned, tags: updatedTags});
             // save localy
             setThemeTags(updatedTags);
         } 
@@ -236,6 +240,13 @@ export function ThemesCard({ theme }:ThemesCardProps) {
             createQRCode(viewUrl, viewQRCodeContainer.current);
         }
     },[setupQRCodePopoverActive, viewQRCodePopoverActive]);
+
+    useEffect(()=>{
+        // update context themes
+        updateTheme({ ...theme, pinned, tags: themeTags });
+        // save to store
+        storeUpdateThemeMeta(theme, { pinned, tags: themeTags });
+    },[themeTags, pinned]);
 
     return (
         <Card>
