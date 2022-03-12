@@ -5,7 +5,7 @@ import { ShopifyTheme } from './utils/interfaces';
 let indexShopifyThemes = new Document<ShopifyTheme, true>({
     document: {
         id: "id",
-        index: ["name"],
+        index: ["name","domainName","tags[]"],
         store: true
     }
 });
@@ -17,6 +17,9 @@ function addShopifyThemesToIndex(themes:ShopifyTheme[]):void {
     for(let i=0; i < themes.length; i++) {
         indexShopifyThemes.add(themes[i]);
     }
+}
+function updateShopifyThemeIndex(theme:ShopifyTheme):void {
+    indexShopifyThemes.update(theme);
 }
 
 // get search results function
@@ -38,6 +41,9 @@ async function handleWorkerEvents(e:MessageEvent):Promise<void> {
                         to: 'popup'
                     }
                 );    
+            break;
+            case 'updateThemeSearchIndex':
+                updateShopifyThemeIndex(message.theme);    
             break;
             case 'searchQuery':
                 const results:EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[] = await getSearchResults(message.query);

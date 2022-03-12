@@ -32,6 +32,12 @@ export function App({getSearchWorker}: Props) {
       return theme;
     });
     setThemes(updatedThemes);
+    // update theme in a search index
+    searchWorker.postMessage({   
+      type: 'updateThemeSearchIndex',
+      theme: newTheme,
+      to: 'searchWorker'
+    });
   }
   
   const updateThemes = (newThemes:ShopifyTheme[]) => {
