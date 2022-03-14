@@ -145,10 +145,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const [newTagValue, setNewTagValue] = useState<string>('');
     // pin btn
     const togglePinBtnClick = useCallback(() => {
-        //const currentPinned = pinned;
-        // save to store
-        //storeUpdateThemeMeta(theme, { pinned: !currentPinned, tags: themeTags});
-        //updateTheme({...theme, pinned: !pinned, tags: themeTags});
         // save localy
         setPinned(!pinned);
         console.log('Pin status: ', pinned);
@@ -191,22 +187,8 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     }, [setupQRCodePopoverActive]);
     // tags
     const removeTag = useCallback((removeTagValue) => () => {
-        //setThemeTags(themeTags.filter(currentTagValue => currentTagValue != removeTagValue));
         const updatedTags: string[] = themeTags.filter(currentTagValue => currentTagValue != removeTagValue);
-        //const updatedTheme: ShopifyTheme = { ...theme };
-        //updatedTheme.tags = updatedTags;
-        // save localy
         setThemeTags(updatedTags);
-        // save to store
-        /*
-        chrome.runtime.sendMessage({
-            type: 'updateThemeMeta',
-            data: {
-                theme: updatedTheme
-            },
-            to: 'sw'
-        });
-        */
     }, [themeTags]);
     const handleNewTagValueChange = useCallback((newValue) => {
         setNewTagValue(newValue);
@@ -214,9 +196,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const handleNewTagSubmit = useCallback(() => {
         if (newTagValue.length > 1) {
             const updatedTags: string[] = [newTagValue, ...themeTags];
-            // save to store
-            //storeUpdateThemeMeta(theme, { pinned, tags: updatedTags});
-            // save localy
             setThemeTags(updatedTags);
         } 
         console.log('Tag submitted: ', newTagValue, themeTags);
@@ -242,10 +221,11 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     },[setupQRCodePopoverActive, viewQRCodePopoverActive]);
 
     useEffect(()=>{
+        const themeMeta: Partial<ThemeMeta> = { pinned, tags: themeTags };
         // update context themes
-        updateTheme({ ...theme, pinned, tags: themeTags });
+        updateTheme({ ...theme, ...themeMeta });
         // save to store
-        storeUpdateThemeMeta(theme, { pinned, tags: themeTags });
+        storeUpdateThemeMeta(theme, themeMeta);
     },[themeTags, pinned]);
 
     return (

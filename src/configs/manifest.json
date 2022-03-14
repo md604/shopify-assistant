@@ -1,8 +1,10 @@
 {
-    "name": "Shopify assistant",
+    "name": "Shopify Assistant",
     "manifest_version": 3,
     "version": "0.1",
-    "description": "Helps to see more details about Shopify pages",
+    "description": "Shopify theme manager and performance inspector",
+    "author": "Maxim Dyuzhinov",
+    "homepage_url": "https://github.com/md604/shopify-assistant",
     "permissions": [
         "storage",
         "webNavigation",

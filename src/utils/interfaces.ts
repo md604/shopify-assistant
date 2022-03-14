@@ -16,7 +16,7 @@ export interface ThemeMeta {
 }
 export const defaultThemeMeta: ThemeMeta = {
     pinned: false,
-    available: false,
+    available: true,
     tags: []
 };
 
@@ -37,7 +37,7 @@ export const defaultShopifyTheme: ShopifyTheme = {
     developer: false,
     pinned: false,
     id: 0,
-    available: false,
+    available: true,
     tags:[]
 };
 

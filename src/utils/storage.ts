@@ -102,7 +102,8 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
             const storeShop:any = result[SHOPS_KEY][domainName];
             // 1. create a list of fetched theme ids from a shopify site
             const newThemesIds: string[] = themes.map((theme:any) => theme.id);
-            const storeThemesIds: string[] = Object.keys(storeShop[SHOP_THEMES_KEY]);
+            //const storeThemesIds: string[] = Object.keys(storeShop[SHOP_THEMES_KEY]);
+            const storeThemesIds: string[] = storeShop[SHOP_THEMES_KEY].map((theme:any) => theme.id);
             // 2. mark store themes that do not exist in fetch results as not available (aka 'gone')
             //    first mark all themes as outdated / unavailable
             //    then mark new themes as actual ones / available
@@ -113,9 +114,10 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
                 storeShop[SHOP_THEMES_META_KEY][storeThemesIds[i]]['available'] = false;
             }
             for(let i = 0; i < newThemesIds.length; i++) {
-                storeShop[SHOP_THEMES_META_KEY][storeThemesIds[i]] ??= {};
+                storeShop[SHOP_THEMES_META_KEY][newThemesIds[i]] ??= {};
                 storeShop[SHOP_THEMES_META_KEY][newThemesIds[i]]['available'] = true;
             }
+            console.log('Mergin old and new theme data old vs new: ', storeShop, shop);
             // merge existing store themes and new themes
             shop[domainName] = {...storeShop, ...shop[domainName]};
         }

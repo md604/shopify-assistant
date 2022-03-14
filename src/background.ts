@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener(
                 case 'updateThemeMeta': 
                     // a message comes from the injected script that picks shopify themes
                     console.log('Got a message of type ShopifyTheme', message.data);
-                    storageUpdateThemeMetaData(message.data.theme ? message.data.theme : {});
+                    await storageUpdateThemeMetaData(message.data.theme ? message.data.theme : {});
                 break;
                 default: console.log('Unknown message type');
             }
