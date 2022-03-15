@@ -10,11 +10,11 @@ Storage model:
 {
     shops: {
         'xxx.myshopify.com': {
-            themes: [
-                { theme_1 obj - raw shopify data }, 
-                { theme_2 obj - raw shopify data },
+            themes: {
+                'theme_1_id': { theme_1 obj - raw shopify data }, 
+                'theme_2_id': { theme_2 obj - raw shopify data },
                 ...
-            ],
+            },
             themesMeta: {
                 'theme_1_id': {
                     available: boolean,
@@ -91,7 +91,7 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
 
 export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean {
     let storageUpdateResult:boolean = false;
-    const { domainName, themes } = data;
+    const { domainName, themes } = data; // themes: Array<any>
     chrome.storage.local.get(SHOPS_KEY, function(result) {
         if (chrome.runtime.lastError) {
             throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
@@ -99,27 +99,20 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
 
         let shop = { [domainName]: {themes: {} as any } }, 
             shops = {};
-            
-        for(let i = 0; i < themes.length; i++) {
-            shop[domainName]['themes'][themes[i].id] = themes[i];
-        }
         
         if (result && result[SHOPS_KEY] && result[SHOPS_KEY][domainName]) {
             const storeShop:any = result[SHOPS_KEY][domainName];
             // 1. create a list of fetched theme ids from a shopify site
-            // const newThemesIds: string[] = themes.map((theme:any) => theme.id);
-            // const storeThemesIds: string[] = Object.keys(storeShop[SHOP_THEMES_KEY]);
-            // const storeThemesIds: string[] = storeShop[SHOP_THEMES_KEY].map((theme:any) => theme.id);
-            const storeThemes: any[] = storeShop[SHOP_THEMES_KEY];
+            storeShop[SHOP_THEMES_META_KEY] ??= {};
+            storeShop[SHOP_THEMES_KEY] ??= {};
+            const storeThemesIds: any[] = Object.keys(storeShop[SHOP_THEMES_KEY]);
             // 2. mark store themes that do not exist in fetch results as not available (aka 'gone')
             //    first mark all themes as outdated / unavailable
             //    then mark new themes as actual ones / available
             //    complexity: O(2n)
-            storeShop[SHOP_THEMES_META_KEY] ??= {};
-            storeShop[SHOP_THEMES_KEY] ??= {};
-            for(let i = 0; i < storeThemes.length; i++) {
-                storeShop[SHOP_THEMES_META_KEY][storeThemes[i].id] ??= {};
-                storeShop[SHOP_THEMES_META_KEY][storeThemes[i].id]['available'] = false;
+            for(let i = 0; i < storeThemesIds.length; i++) {
+                storeShop[SHOP_THEMES_META_KEY][storeThemesIds[i]] ??= {};
+                storeShop[SHOP_THEMES_META_KEY][storeThemesIds[i]]['available'] = false;
             }
             for(let i = 0; i < themes.length; i++) {
                 // replace existing themes data by a new one
@@ -131,6 +124,10 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean 
             console.log('Mergin old and new theme data old vs new: ', storeShop, shop);
             // merge existing store themes and new themes
             shop[domainName] = storeShop; //{...storeShop, ...shop[domainName]};
+        } else {
+            for(let i = 0; i < themes.length; i++) {
+                shop[domainName]['themes'][themes[i].id] = themes[i];
+            }
         }
 
         shops = { ...result[SHOPS_KEY], ...shop };

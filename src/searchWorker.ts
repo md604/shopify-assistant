@@ -21,6 +21,9 @@ function addShopifyThemesToIndex(themes:ShopifyTheme[]):void {
 function updateShopifyThemeIndex(theme:ShopifyTheme):void {
     indexShopifyThemes.update(theme);
 }
+function deleteShopifyThemeIndex(theme:ShopifyTheme):void {
+    indexShopifyThemes.remove(theme.id);
+}
 
 // get search results function
 //SimpleDocumentSearchResultSetUnit[]
@@ -44,6 +47,9 @@ async function handleWorkerEvents(e:MessageEvent):Promise<void> {
             break;
             case 'updateThemeSearchIndex':
                 updateShopifyThemeIndex(message.theme);    
+            break;
+            case 'deleteThemeSearchIndex':
+                deleteShopifyThemeIndex(message.theme);    
             break;
             case 'searchQuery':
                 const results:EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[] = await getSearchResults(message.query);

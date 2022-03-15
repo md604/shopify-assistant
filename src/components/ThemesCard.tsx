@@ -20,6 +20,7 @@ import { LinkMinor,
     NoteMajor,
     SettingsMajor,
     PinMajor,
+    DeleteMajor,
     CircleTickMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
@@ -130,7 +131,7 @@ type ThemesCardProps = {
 };
 
 export function ThemesCard({ theme }:ThemesCardProps) {
-    const { updateTheme } = useContext(PopupContext);
+    const { updateTheme, deleteTheme } = useContext(PopupContext);
     const [badgeData, setBadgeData] = useState<BadgeProps>(getBadgeProps(theme));
     const [tagPopoverActive, setTagPopoverActive] = useState<boolean>(false);
     const viewQRCodeContainer = useRef<HTMLDivElement>(null);
@@ -148,6 +149,12 @@ export function ThemesCard({ theme }:ThemesCardProps) {
         // save localy
         setPinned(!pinned);
         console.log('Pin status: ', pinned);
+    }, []);
+    // delete btn
+    const deleteBtnClick = useCallback(() => {
+        // save localy
+        deleteTheme(theme);
+        //console.log('Pin status: ', pinned);
     }, []);
     // view btn
     const [viewUrl, setViewUrl] = useState<string>(getViewUrl(theme)); 
@@ -249,11 +256,11 @@ export function ThemesCard({ theme }:ThemesCardProps) {
                             <p><TextStyle variation="subdued">{theme.domainName}</TextStyle></p>
                         </TextContainer>
                     </div>
-                    <div style={{ minWidth: '56px', textAlign: 'right' }} className={pinned ? 'pin-btn--active' : ''}>
+                    <div style={{ minWidth: '56px', textAlign: 'right' }} className={pinned && theme.available ? 'pin-btn--active' : ''}>
                         <Button 
-                        onClick={togglePinBtnClick}
+                        onClick={theme.available ? togglePinBtnClick : deleteBtnClick}
                         icon={
-                            <Icon source={PinMajor} />
+                            <Icon source={theme.available ? PinMajor : DeleteMajor} />
                         }></Button>
                     </div>
                 </div>

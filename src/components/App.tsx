@@ -40,6 +40,17 @@ export function App({getSearchWorker}: Props) {
     });
   }
   
+  const deleteTheme = (deletedTheme:ShopifyTheme) => {
+    const updatedThemes:ShopifyTheme[] = themes.filter(theme => theme.id != deletedTheme.id);
+    setThemes(updatedThemes);
+    // update theme in a search index
+    searchWorker.postMessage({   
+      type: 'deleteThemeSearchIndex',
+      theme: deletedTheme,
+      to: 'searchWorker'
+    });
+  }
+
   const updateThemes = (newThemes:ShopifyTheme[]) => {
     setThemes(newThemes);
   }
@@ -120,7 +131,7 @@ export function App({getSearchWorker}: Props) {
   ];
 
   return (
-    <PopupContext.Provider value={{ config, themes, updateTheme, updateThemes, resetThemes, getSearchWorker }}>
+    <PopupContext.Provider value={{ config, themes, updateTheme, deleteTheme, updateThemes, resetThemes, getSearchWorker }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>
