@@ -189,4 +189,32 @@ export function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<ThemeMet
     });
 }
 
+export function storageDeleteThemeData(theme: ShopifyTheme):boolean {
+    let storageUpdateResult:boolean = false;
+    const { domainName, id } = theme;
+    chrome.storage.local.get(SHOPS_KEY, function(result) {
+        if (chrome.runtime.lastError) {
+            throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
+        }
+        if (result && result[SHOPS_KEY] && result[SHOPS_KEY][domainName]) {
+            const storeShop:any = result[SHOPS_KEY][domainName];
+            let shops:any = {};
+            
+            delete storeShop[SHOP_THEMES_META_KEY][id];
+            delete storeShop[SHOP_THEMES_KEY][id];
+            shops = { ...result[SHOPS_KEY], [domainName]: storeShop };
+
+            chrome.storage.local.set({ shops }, function() {
+                if (chrome.runtime.lastError) {
+                    // will last catch get this error?
+                    throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
+                }
+                console.log('Shops data has been updated in a local storage: ', shops);
+                storageUpdateResult = true; 
+            });  
+        } 
+    });
+    return storageUpdateResult;
+}
+
 export default {}

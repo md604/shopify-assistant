@@ -148,14 +148,12 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     const togglePinBtnClick = useCallback(() => {
         // save localy
         setPinned(!pinned);
-        console.log('Pin status: ', pinned);
     }, []);
     // delete btn
-    const deleteBtnClick = useCallback(() => {
+    const deleteBtnClick = () => {
         // save localy
         deleteTheme(theme);
-        //console.log('Pin status: ', pinned);
-    }, []);
+    };
     // view btn
     const [viewUrl, setViewUrl] = useState<string>(getViewUrl(theme)); 
     const handleViewBtnClick = useCallback(() => {
