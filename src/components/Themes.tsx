@@ -14,7 +14,6 @@ export function Themes() {
     const handleFilterQueryClear = useCallback(() => {
         setFilterQuery('');
         resetThemes();
-        console.log('Clear search query and show full theme list');
     }, []);
     const { config, resetThemes, getSearchWorker } = useContext(PopupContext);
 
@@ -30,7 +29,6 @@ export function Themes() {
                         to: 'sw'
                     }
                 );
-                console.log('You typed: ', filterQuery);
             }
         } else {
             resetThemes();

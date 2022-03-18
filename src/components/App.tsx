@@ -6,10 +6,9 @@ import {
   Link,
   Tabs,
 } from '@shopify/polaris';
-import {ImportMinor} from '@shopify/polaris-icons';
 import { Themes } from './Themes';
 import { PopupContext, initAppConfig } from './PopupContext';
-import { getLocalThemes } from '../utils/storage';
+import { getLocalThemes, storageDeleteThemeData } from '../utils/storage';
 import { ShopifyTheme, AppConfig } from '../utils/interfaces';
 
 
@@ -42,6 +41,7 @@ export function App({getSearchWorker}: Props) {
   
   const deleteTheme = (deletedTheme:ShopifyTheme) => {
     const updatedThemes:ShopifyTheme[] = themes.filter(theme => theme.id != deletedTheme.id);
+    // save localy
     setThemes(updatedThemes);
     // update theme in a search index
     searchWorker.postMessage({   
@@ -49,6 +49,8 @@ export function App({getSearchWorker}: Props) {
       theme: deletedTheme,
       to: 'searchWorker'
     });
+    // remove from the store
+    storageDeleteThemeData(deletedTheme);
   }
 
   const updateThemes = (newThemes:ShopifyTheme[]) => {
@@ -70,11 +72,11 @@ export function App({getSearchWorker}: Props) {
       if (message.type) {
           switch (message.type) {
               case 'searchResults':
-                  console.log('Search results: ', message.results);
+                  // console.log('Search results: ', message.results);
                   if (message.results && message.results.length > 0) setThemes(message.results);
               break;
               case 'enableSearchBar':
-                  console.log('New search state: ', message.value);
+                  // console.log('New search state: ', message.value);
                   updateConfig({ enableSearchBar: message.value });
               break;
               default: console.log('(Popup listener) Unknown message type');
@@ -109,7 +111,6 @@ export function App({getSearchWorker}: Props) {
       break;
     }
     updateConfig({ tabFilterThemeProperty: tabFilter });
-    console.log('Select tab');
   },[selected]);
 
   const tabs = [

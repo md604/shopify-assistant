@@ -53,7 +53,7 @@ async function handleWorkerEvents(e:MessageEvent):Promise<void> {
             break;
             case 'searchQuery':
                 const results:EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[] = await getSearchResults(message.query);
-                console.log('(background js) Got a search querry and results:', results);
+                // console.log('(background js) Got a search querry and results:', results);
                 if (results && results.length > 0) {
                     const themes:ShopifyTheme[] = [];
                     for(let i = 0; i < results.length; i++){

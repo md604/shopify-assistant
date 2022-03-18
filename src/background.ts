@@ -55,16 +55,15 @@ chrome.runtime.onMessage.addListener(
         if (message.to == 'sw' && message.type) {
             switch (message.type) {
                 case 'newThemes': 
-                    // a message comes from the injected script that picks shopify themes
-                    console.log('Got a message of type THEMES', message.data);
+                    // a message comes from the injected script that gets shopify themes
+                    // console.log('Got a message of type THEMES', message.data);
                     storageUpdateOriginalThemesData({
                         domainName: message.domainName,
                         themes: message.data.themes ? message.data.themes : [] 
                     });
                 break;
                 case 'updateThemeMeta': 
-                    // a message comes from the injected script that picks shopify themes
-                    console.log('Got a message of type ShopifyTheme', message.data);
+                    // console.log('Got a message of type ShopifyTheme', message.data);
                     await storageUpdateThemeMetaData(message.data.theme ? message.data.theme : {});
                 break;
                 default: console.log('Unknown message type');

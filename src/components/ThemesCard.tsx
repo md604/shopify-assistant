@@ -18,10 +18,8 @@ import { Card,
 import { LinkMinor, 
     ProductsMajor,
     NoteMajor,
-    SettingsMajor,
     PinMajor,
     DeleteMajor,
-    CircleTickMinor,
     ClipboardMinor,
     ShopcodesMajor } from '@shopify/polaris-icons';
 import { PopupContext } from './PopupContext';
@@ -33,11 +31,7 @@ function getLastUpdateMsg(t:number):string {
     const presentTime:number = Date.now(),
         timeSinceLastUpdate:number = presentTime - t, 
         ONE_DAY:number = 60 * 60 * 24,
-        TWO_DAYS:number = ONE_DAY * 2,
-        THREE_DAYS:number = ONE_DAY * 3,
-        options = {
-
-        };
+        THREE_DAYS:number = ONE_DAY * 3;
     if (timeSinceLastUpdate > THREE_DAYS) {
         msg = `Updated ${new Intl.DateTimeFormat(
             'default', 
@@ -157,7 +151,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     // view btn
     const [viewUrl, setViewUrl] = useState<string>(getViewUrl(theme)); 
     const handleViewBtnClick = useCallback(() => {
-        console.log('Open view url in a new window: ', viewUrl);
         chrome.tabs.create(
             {
                 active: false,
@@ -167,7 +160,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     }, []);
     const handleViewClipboardBtnClick = useCallback(() => {
         setClipboard(viewUrl);
-        console.log('Copy view url to the clipboard: ', viewUrl);
     }, []);
     const toggleViewQRCodePopoverActive = useCallback(() => {
         setViewQRCodePopoverActive(!viewQRCodePopoverActive);
@@ -175,7 +167,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     // setup or configurer btn
     const [setupUrl, setSetupUrl] = useState<string>(getSetupUrl(theme));
     const handleSetupBtnClick = useCallback(() => {
-        console.log('Open setup url in a new window: ', setupUrl);
         chrome.tabs.create(
             {
                 active: false,
@@ -185,7 +176,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     }, []);
     const handleSetupClipboardBtnClick = useCallback(() => {
         setClipboard(setupUrl);
-        console.log('Copy setup url to the clipboard: ', setupUrl);
     }, []);
     const toggleSetupQRCodePopoverActive = useCallback(() => {
         setSetupQRCodePopoverActive(!setupQRCodePopoverActive);
@@ -203,7 +193,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
             const updatedTags: string[] = [newTagValue, ...themeTags];
             setThemeTags(updatedTags);
         } 
-        console.log('Tag submitted: ', newTagValue, themeTags);
         setNewTagValue('');
         toggleTagPopoverActive();
     }, [newTagValue]);
@@ -213,7 +202,6 @@ export function ThemesCard({ theme }:ThemesCardProps) {
     // show more
     const handleShowMoreBtnClick = useCallback(() => {
         setShowMoreOptions(!showMoreOptions);
-        console.log('Show all options', showMoreOptions);
     }, [showMoreOptions]);
 
     useEffect(()=>{

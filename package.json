@@ -2,7 +2,7 @@
   "name": "shopify-assistant",
   "private": true,
   "version": "0.1.0",
-  "description": "Chrome extention that makes work with multiple shops easier",
+  "description": "Chrome extention that makes your daily shopify routine easier",
   "license": "MIT",
   "scripts": {
     "build": "webpack build --mode development",

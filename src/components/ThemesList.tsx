@@ -14,7 +14,6 @@ function getFilteredThemes(themes:ShopifyTheme[],config:AppConfig):ShopifyTheme[
             filterValue = config.tabFilterThemeProperty[filterKey as keyof ShopifyTheme];
         result = themes.filter(theme => theme[filterKey as keyof ShopifyTheme] == filterValue);
     } 
-    console.log('Config value: ', config, themes, result);
     
     return result;
 }
