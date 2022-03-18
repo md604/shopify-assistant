@@ -5,6 +5,7 @@
   "description": "Chrome extention that makes your daily shopify routine easier",
   "license": "MIT",
   "scripts": {
+    "build:prod": "webpack build --mode production",
     "build": "webpack build --mode development",
     "prewatch": "rimraf ./dist",
     "watch": "webpack watch --mode development"
