@@ -58,7 +58,7 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
                                 const theme:any = initDomainThemes[themeId]; 
                                 // compose a ShopifyTheme object based on raw and meta data from the storage 
                                 const themeMeta:ThemeMeta = domainThemesMeta[theme.id] ? 
-                                    domainThemesMeta[theme.id]
+                                    { ...defaultThemeMeta, ...domainThemesMeta[theme.id] }
                                     :
                                     defaultThemeMeta;
                                 return {
