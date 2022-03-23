@@ -8,7 +8,8 @@
     "build:prod": "webpack build --mode production",
     "build": "webpack build --mode development",
     "prewatch": "rimraf ./dist",
-    "watch": "webpack watch --mode development"
+    "watch": "webpack watch --mode development",
+    "zip": "zip -j zips/$npm_config_name dist/*"
   },
   "dependencies": {
     "@shopify/polaris": "^6.4.0",

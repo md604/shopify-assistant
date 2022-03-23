@@ -1,15 +1,14 @@
 {
     "name": "Shopify Assistant",
     "manifest_version": 3,
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Shopify theme manager",
     "author": "Maxim Dyuzhinov",
     "homepage_url": "https://github.com/md604/shopify-assistant",
     "permissions": [
         "storage",
         "webNavigation",
-        "scripting",
-        "tabs"
+        "scripting"
     ],
     "host_permissions": [
         "https://*.myshopify.com/"
