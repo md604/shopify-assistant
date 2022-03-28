@@ -62,8 +62,8 @@ Before you come up with some idea for improvement, would you mind having a look 
 - [ ] Use chrome API to automate build and deployment pipelines;
 
 **User experience:**
-- [ ] Add infinite scroll;
-- [ ] Show themes number for each tab (all/pinned/gone);
+- [ ] Add infinite scroll (#1);
+- [ ] Show themes number for each tab (all/pinned/gone) (#2);
 - [ ] Create collapsable theme groups by domain;
 
 **Search**
