@@ -1,16 +1,17 @@
 {
   "name": "shopify-assistant",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Chrome extention that makes your daily shopify routine easier",
   "license": "MIT",
   "scripts": {
     "prebuild:prod": "yarn test",
     "build:prod": "webpack build --mode production",
+    "prebuild": "rimraf ./dist",
     "build": "webpack build --mode development",
     "prewatch": "rimraf ./dist",
     "watch": "webpack watch --mode development",
-    "zip": "zip -j zips/$npm_config_name dist/*",
+    "zip": "ts-node task_scripts/create_zip.ts",
     "test": "jest"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
     "@types/chrome": "^0.0.177",
     "@types/flexsearch": "^0.7.2",
     "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.23",
     "@types/qrcode": "^1.4.2",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
@@ -43,6 +45,8 @@
     "style-loader": "^2.0.0",
     "ts-jest": "^27.1.4",
     "ts-loader": "^9.2.6",
+    "ts-node": "^10.7.0",
+    "tslib": "^2.3.1",
     "typescript": "^4.5.5",
     "webpack": "^5.37.0",
     "webpack-cli": "^4.7.0"
