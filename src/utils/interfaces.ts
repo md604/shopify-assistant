@@ -41,7 +41,7 @@ export const defaultShopifyTheme: ShopifyTheme = {
     tags:[]
 };
 
-// data representaion of the raw data fetched via store API
+// augmented data representaion of the raw data (themes: any) fetched via store API
 // /admin/themes.js
 export interface StorageThemesData {
     domainName: string,
