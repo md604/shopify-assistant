@@ -31,7 +31,8 @@ Storage model:
 
 const SHOPS_KEY:string = 'shops',
     SHOP_THEMES_KEY:string = 'themes', 
-    SHOP_THEMES_META_KEY:string = 'themesMeta';
+    SHOP_THEMES_META_KEY:string = 'themesMeta',
+    DUMMY_SHOP_PREFIX:string = 'dummy-shop-';
 
 //const getKeyValue = <U extends keyof T, T extends object>(key: U) => (obj: T) => obj[key];
 //const getTypeKey = <U extends keyof T>(key: U) => key;
@@ -77,6 +78,7 @@ export function transformStorageShopsDataToShopifyThemes(storageData:any):Shopif
 
 export function getUpdatedStorageShops(newThemeData:StorageThemesData, currentShopsData:any) {
     // themes - data fetched from the Shopify API endpoint themes.json
+    // domainName - a domain where fetch was performed
     const { domainName, themes } = newThemeData; // themes: Array<any>
     const shop = { [domainName]: {themes: {} as any } };
     
@@ -158,25 +160,30 @@ export function getLocalThemes():Promise<ShopifyTheme[]> {
     });
 }
  
-export function storageUpdateOriginalThemesData(data:StorageThemesData):boolean {
-    let storageUpdateResult:boolean = false;
-    chrome.storage.local.get(SHOPS_KEY, function(result) {
-        if (chrome.runtime.lastError) {
-            throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
-        }
+export function storageUpdateOriginalThemesData(data:StorageThemesData):Promise<boolean> {
+    return new Promise((resolve,reject) => {
+        try {
+            chrome.storage.local.get(SHOPS_KEY, function(result) {
+                if (chrome.runtime.lastError) {
+                    throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
+                }
+                
+                const shops = getUpdatedStorageShops(data, result);
         
-        const shops = getUpdatedStorageShops(data, result);
-
-        chrome.storage.local.set({ shops }, function() {
-            if (chrome.runtime.lastError) {
-                // will last catch get this error?
-                throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
-            }
-            // console.log('Shops data has been updated in a local storage: ', shops);
-            storageUpdateResult = true; 
-        });
+                chrome.storage.local.set({ shops }, function() {
+                    if (chrome.runtime.lastError) {
+                        // will last catch get this error?
+                        throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
+                    }
+                    // console.log('Shops data has been updated in a local storage: ', shops);
+                    resolve(true); 
+                });
+            });
+        } catch (err) {
+            console.log('Local storage, update theme meta data error: ', err);
+            reject(false);
+        }
     });
-    return storageUpdateResult;
 }
 
 export function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<ThemeMeta> {
@@ -233,6 +240,100 @@ export function storageDeleteThemeData(theme: ShopifyTheme):boolean {
                 storageUpdateResult = true; 
             });  
         } 
+    });
+    return storageUpdateResult;
+}
+
+// Test functions
+
+// on extention reload event it populates the store 
+// with a dummy theme's data if it does not already exist there
+
+function generateDummyTheme(themeIndex = 0, shopIndex = 0):any {
+    const themeId = 100000000000 + shopIndex * 1000 + themeIndex,
+        shopId = 100 + shopIndex,
+        randomWords = [
+            'car', 
+            'sale', 
+            'new', 
+            'irresistable', 
+            'test', 
+            'dev', 
+            'feature', 
+            'release',
+            'flesh',
+            'backup'
+        ],
+        randomWord = randomWords[Math.floor(Math.random() * randomWords.length)],
+        currentDate = new Date().toISOString().split('.')[0] + '-04:00';
+    let themeRole = 'unpublished';
+    
+    if (themeIndex === 0) {
+        themeRole = 'main';
+    } 
+    /*
+    else if (themeIndex === 1) {
+        themeRole = 'main';
+    }
+    */
+    return {
+        id: themeId,
+        name: `Dummy theme ${themeIndex}: ${randomWord}`,
+        created_at: currentDate,
+        updated_at: currentDate,
+        role: themeRole,
+        theme_store_id: shopId,
+        previewable: true,
+        processing: false,
+        admin_graphql_api_id: `gid:\/\/shopify\/Theme\/${themeId}`
+    };
+}
+
+export async function generateDummyThemes(numberOfShops = 5, numberOfThemes = 20) {
+    for(let i = 0; i < numberOfShops; i++) {
+        const themes = [];
+        for(let j = 0; j < numberOfThemes; j++){
+            themes.push(generateDummyTheme(j, i));
+        }
+        
+        await storageUpdateOriginalThemesData({
+            domainName: `${DUMMY_SHOP_PREFIX}${i}.myshopify.com`, 
+            themes
+        });
+
+        console.log(`Dummy shop ${i}`, {
+            domainName: `${DUMMY_SHOP_PREFIX}${i}.myshopify.com`, 
+            themes
+        });
+    }
+}
+
+// removes all dummy data from the store
+
+export function removeDummyThemes() {
+    let storageUpdateResult:boolean = false;
+    chrome.storage.local.get(SHOPS_KEY, function(result) {
+        if (chrome.runtime.lastError) {
+            throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
+        }
+        if (result && result[SHOPS_KEY]) {
+            const shopDomains = Object.keys(result[SHOPS_KEY]);
+
+            for (let i = 0; i < shopDomains.length; i++) {
+                if (shopDomains[i].match(DUMMY_SHOP_PREFIX)) {
+                    delete result[SHOPS_KEY][shopDomains[i]];
+                }
+            }
+            
+            chrome.storage.local.set({ shops: {...result[SHOPS_KEY]} }, function() {
+                if (chrome.runtime.lastError) {
+                    // will last catch get this error?
+                    throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
+                }
+                console.log(`Dummy themes have been deleted from a local storage: `, {...result[SHOPS_KEY]});
+                storageUpdateResult = true;
+            });
+        }
     });
     return storageUpdateResult;
 }

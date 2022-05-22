@@ -31,6 +31,7 @@ export function App({getSearchWorker}: Props) {
       return theme;
     });
     setThemes(updatedThemes);
+    // sync local changes with the store
     // update theme in a search index
     searchWorker.postMessage({   
       type: 'updateThemeSearchIndex',
@@ -43,6 +44,7 @@ export function App({getSearchWorker}: Props) {
     const updatedThemes:ShopifyTheme[] = themes.filter(theme => theme.id != deletedTheme.id);
     // save localy
     setThemes(updatedThemes);
+    // sync local changes with the store
     // update theme in a search index
     searchWorker.postMessage({   
       type: 'deleteThemeSearchIndex',
@@ -132,7 +134,15 @@ export function App({getSearchWorker}: Props) {
   ];
 
   return (
-    <PopupContext.Provider value={{ config, themes, updateTheme, deleteTheme, updateThemes, resetThemes, getSearchWorker }}>
+    <PopupContext.Provider value={{ 
+      config, 
+      themes, 
+      updateTheme, 
+      deleteTheme, 
+      updateThemes, 
+      resetThemes, 
+      getSearchWorker 
+    }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>

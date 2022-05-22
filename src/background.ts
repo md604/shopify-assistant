@@ -1,6 +1,8 @@
 import { 
     storageUpdateOriginalThemesData, 
-    storageUpdateThemeMetaData
+    storageUpdateThemeMetaData,
+    generateDummyThemes,
+    removeDummyThemes
 } from './utils/storage';
 
 const filter = {
@@ -94,6 +96,10 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
         // do something after reloading extention
+        
+        //console.log('Reload extension');
+        //generateDummyThemes(20, 20);
+        //removeDummyThemes();
     }
     /*
     if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
