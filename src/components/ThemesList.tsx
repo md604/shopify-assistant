@@ -11,16 +11,18 @@ function getFilteredThemes(themes:ShopifyTheme[],config:AppConfig):ShopifyTheme[
             filterValue = config.tabFilterThemeProperty[filterKey as keyof ShopifyTheme];
         result = themes.filter(theme => theme[filterKey as keyof ShopifyTheme] == filterValue);
     } 
-    
     return result;
 }
 
 export function ThemesList() {
-    const { themes, config } = useContext(PopupContext);
+    const { themes, config, updateThemeCounter } = useContext(PopupContext);
     const filteredThemes = useMemo(() => getFilteredThemes(themes, config), [themes, config]);
     useEffect(() => {
         console.log(config);
     },[config]);
+    useEffect(() => {
+        updateThemeCounter(filteredThemes.length);
+    },[filteredThemes]);
     return (
         <div style={{margin: '16px auto 0'}}>
             {

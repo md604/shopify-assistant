@@ -5,6 +5,7 @@ import {
   Card,
   Link,
   Tabs,
+  Badge
 } from '@shopify/polaris';
 import { Themes } from './Themes';
 import { PopupContext, initAppConfig } from './PopupContext';
@@ -66,6 +67,11 @@ export function App({getSearchWorker}: Props) {
   const updateConfig = (newConfig:Partial<AppConfig>) => {
     setConfig({...config, ...newConfig});
   }
+
+  const [themeCounter, setThemeCounter] = useState<number>(0);
+  const updateThemeCounter = (newCounterValue:number) => {
+    setThemeCounter(newCounterValue);
+  }
   
   // update context after mount
   useEffect(() => {
@@ -118,17 +124,32 @@ export function App({getSearchWorker}: Props) {
   const tabs = [
     {
       id: 'themes-tab-1',
-      content: 'All themes',
+      //content: 'All themes'
+      content: (
+        <span>
+          Themes {selected === 0 && <Badge status="new">{String(themeCounter)}</Badge>}
+        </span>
+      ),
       panelID: 'themes-tab-content-1',
     },
     {
       id: 'themes-tab-2',
-      content: 'Pinned themes',
+      //content: 'Pinned',
+      content: (
+        <span>
+          Pinned {selected === 1 && <Badge status="new">{String(themeCounter)}</Badge>}
+        </span>
+      ),
       panelID: 'themes-tab-content-2',
     },
     {
       id: 'themes-tab-3',
-      content: 'Gone',
+      //content: 'Gone',
+      content: (
+        <span>
+          Gone {selected === 2 && <Badge status="new">{String(themeCounter)}</Badge>}
+        </span>
+      ),
       panelID: 'themes-tab-content-3',
     }
   ];
@@ -141,7 +162,8 @@ export function App({getSearchWorker}: Props) {
       deleteTheme, 
       updateThemes, 
       resetThemes, 
-      getSearchWorker 
+      getSearchWorker,
+      updateThemeCounter 
     }}>
       <Layout>
         <Layout.Section>
