@@ -5,6 +5,7 @@ import {
   Card,
   Link,
   Tabs,
+  Badge
 } from '@shopify/polaris';
 import { Themes } from './Themes';
 import { PopupContext, initAppConfig } from './PopupContext';
@@ -31,6 +32,7 @@ export function App({getSearchWorker}: Props) {
       return theme;
     });
     setThemes(updatedThemes);
+    // sync local changes with the store
     // update theme in a search index
     searchWorker.postMessage({   
       type: 'updateThemeSearchIndex',
@@ -43,6 +45,7 @@ export function App({getSearchWorker}: Props) {
     const updatedThemes:ShopifyTheme[] = themes.filter(theme => theme.id != deletedTheme.id);
     // save localy
     setThemes(updatedThemes);
+    // sync local changes with the store
     // update theme in a search index
     searchWorker.postMessage({   
       type: 'deleteThemeSearchIndex',
@@ -63,6 +66,11 @@ export function App({getSearchWorker}: Props) {
   const [config, setConfig] = useState<AppConfig>(initAppConfig);
   const updateConfig = (newConfig:Partial<AppConfig>) => {
     setConfig({...config, ...newConfig});
+  }
+
+  const [themeCounter, setThemeCounter] = useState<number>(0);
+  const updateThemeCounter = (newCounterValue:number) => {
+    setThemeCounter(newCounterValue);
   }
   
   // update context after mount
@@ -116,23 +124,47 @@ export function App({getSearchWorker}: Props) {
   const tabs = [
     {
       id: 'themes-tab-1',
-      content: 'All themes',
+      //content: 'All themes'
+      content: (
+        <span>
+          Themes {selected === 0 && <Badge status="new">{String(themeCounter)}</Badge>}
+        </span>
+      ),
       panelID: 'themes-tab-content-1',
     },
     {
       id: 'themes-tab-2',
-      content: 'Pinned themes',
+      //content: 'Pinned',
+      content: (
+        <span>
+          Pinned {selected === 1 && <Badge status="new">{String(themeCounter)}</Badge>}
+        </span>
+      ),
       panelID: 'themes-tab-content-2',
     },
     {
       id: 'themes-tab-3',
-      content: 'Gone',
+      //content: 'Gone',
+      content: (
+        <span>
+          Gone {selected === 2 && <Badge status="new">{String(themeCounter)}</Badge>}
+        </span>
+      ),
       panelID: 'themes-tab-content-3',
     }
   ];
 
   return (
-    <PopupContext.Provider value={{ config, themes, updateTheme, deleteTheme, updateThemes, resetThemes, getSearchWorker }}>
+    <PopupContext.Provider value={{ 
+      config, 
+      themes, 
+      updateTheme, 
+      deleteTheme, 
+      updateThemes, 
+      resetThemes, 
+      getSearchWorker,
+      updateThemeCounter 
+    }}>
       <Layout>
         <Layout.Section>
           <Card sectioned>
