@@ -5,6 +5,7 @@
 #### [What is it?](#what-is-it-anchor)
 #### [How to use it?](#how-to-use-it-anchor)
 #### [How to contribute?](#how-to-contribute-anchor)
+#### :gear: [Setup a local dev environment](#local-dev-environment)
 
 ---
 ### What is it? <span id="what-is-it-anchor"></span>
@@ -57,13 +58,13 @@ Whatever you want to propose, it would be great if your modifications are inline
 Before you come up with some idea for improvement, would you mind having a look at the following tasks from the mid-term roadmap first: 
 
 **Best practices:**
-- [ ] Add functional tests;
+- [x] Add functional tests;
 - [ ] Add client-side/github-side code linters and prettyfiers;
 - [ ] Use chrome API to automate build and deployment pipelines;
 
 **User experience:**
-- [ ] Add infinite scroll (#1);
-- [ ] Show themes number for each tab (all/pinned/gone) (#2);
+- [x] Add infinite scroll (#1);
+- [x] Show themes number for each tab (all/pinned/gone) (#2);
 - [ ] Create collapsable theme groups by domain;
 
 **Search**
@@ -74,4 +75,47 @@ Before you come up with some idea for improvement, would you mind having a look 
 - [ ] automatically show/add theme links when theme's name is mentioned on the page;
 - [ ] in the main popup modal show tasks linked to a theme;
 
+:warning::warning::warning: :construction::construction::construction::construction::construction: :warning::warning::warning:
 
+### :gear: Setup a local dev environment <span id="local-dev-environment"></span>
+
+**Note**: `yarn` should be already installed on your machine. If this is not the case please follow the installation instructions on the [official site](https://classic.yarnpkg.com/en/docs/install).
+
+Clone the project into your working folder: 
+```
+git clone git@github.com:md604/shopify-assistant.git shopify-assistant
+```
+Go to the extension folder:
+```
+cd shopify-assistant
+```
+Install node dependencies:
+```
+yarn install
+```
+Create some dummy themes to work with by uncommenting the `generateDummyThemes()` function in the **shopify-assistant/src/background.ts** file: 
+```js
+  chrome.runtime.onInstalled.addListener(async (details) => {
+    if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
+        // do something after reloading extention
+        
+        //console.log('Reload extension');
+        //generateDummyThemes(20, 20);
+        //removeDummyThemes();
+    }
+```
+Please make sure that you comment out this line after the first extention load, othwerwise new dummy themes will be created each time you reload extension. That may happen after creating a new build for example.
+
+Create your first build!
+```
+yarn build
+```
+
+Then open chrome's extension administration pannel via URL:
+```
+chrome://extensions/
+```
+
+Enable a developer mode and use a "Load unpacked" button to load your extension files from the **shopify-assistant/dist** folder.
+
+:clap: Congratulations! You are good to go. And don't foget to rebuild the extension with the `generateDummyThemes()` function commented.
