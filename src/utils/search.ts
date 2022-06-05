@@ -1,4 +1,4 @@
-import { Document, EnrichedDocumentSearchResultSetUnit, SimpleDocumentSearchResultSetUnit } from 'flexsearch';
+import { Document, EnrichedDocumentSearchResultSetUnit } from 'flexsearch';
 import { getLocalThemes } from './storage';
 import { ShopifyTheme } from './interfaces'; 
 
@@ -30,7 +30,6 @@ export function getIndexShopifyThemesEntriesNumber():number {
     return indexShopifyThemesEntriesNumber;
 }
 // get search results function
-//SimpleDocumentSearchResultSetUnit[]
 export async function getSearchResults(query:string):Promise<EnrichedDocumentSearchResultSetUnit<ShopifyTheme>[]> {
     return indexShopifyThemes.searchAsync(query, { enrich: true });
 };

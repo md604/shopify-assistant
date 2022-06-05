@@ -57,11 +57,11 @@ export function App({getSearchWorker}: Props) {
   }
 
   const updateThemes = (newThemes:ShopifyTheme[]) => {
-    setThemes(newThemes);
+    setThemes([...newThemes]);
   }
   const resetThemes = async () => {
     const newThemes:ShopifyTheme[] = await getLocalThemes();
-    setThemes(newThemes);
+    setThemes([...newThemes]);
   }
   const [config, setConfig] = useState<AppConfig>(initAppConfig);
   const updateConfig = (newConfig:Partial<AppConfig>) => {

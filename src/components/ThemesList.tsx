@@ -17,9 +17,9 @@ function getFilteredThemes(themes:ShopifyTheme[],config:AppConfig):ShopifyTheme[
 export function ThemesList() {
     const { themes, config, updateThemeCounter } = useContext(PopupContext);
     const filteredThemes = useMemo(() => getFilteredThemes(themes, config), [themes, config]);
-    useEffect(() => {
-        console.log(config);
-    },[config]);
+    // useEffect(() => {
+    //     console.log(config);
+    // },[config]);
     useEffect(() => {
         updateThemeCounter(filteredThemes.length);
     },[filteredThemes]);

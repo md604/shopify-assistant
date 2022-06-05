@@ -175,7 +175,6 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):Promise<
                         // will last catch get this error?
                         throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
                     }
-                    // console.log('Shops data has been updated in a local storage: ', shops);
                     resolve(true); 
                 });
             });
@@ -186,7 +185,7 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):Promise<
     });
 }
 
-export function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<ThemeMeta> {
+export async function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<ThemeMeta> {
     const themeMeta:any = {},
         { domainName, id } = theme;
     let metaKey: keyof ThemeMeta;
@@ -195,29 +194,34 @@ export function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<ThemeMet
         themeMeta[metaKey] = theme[metaKey];
     }
     
-    return new Promise((resolve,reject) => {
-        try {
-            chrome.storage.local.get(SHOPS_KEY, function(result) {
+    const currentShops = await chrome.storage.local.get(SHOPS_KEY)
+        .then(result => {
                 if (chrome.runtime.lastError) {
                     throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
                 }
+                return result; 
+        })
+        .catch(error => {
+            console.log(`Error in a storageUpdateThemeMetaData function, get section: `, error);
+            return {shops:{}};
+        });
+    
+    const shops = getUpdatedStorageShopsWithNewThemeMeta(domainName,id,themeMeta, currentShops);
+    
+    const results = await chrome.storage.local.set({ shops })
+        .then(result => {
+            if (chrome.runtime.lastError) {
+                // will last catch get this error?
+                throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
+            }
+            return themeMeta;
+        })
+        .catch(error => {
+            console.log(`Error in a storageUpdateThemeMetaData function, set section: `, error);
+            return themeMeta;
+        });
 
-                const shops = getUpdatedStorageShopsWithNewThemeMeta(domainName,id,themeMeta, result);
-
-                chrome.storage.local.set({ shops }, function() {
-                    if (chrome.runtime.lastError) {
-                        // will last catch get this error?
-                        throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
-                    }
-                    resolve(themeMeta);
-                    // console.log('Shops data has been updated in a local storage: ', shops);
-                });
-            });
-        } catch (err) {
-            console.log('Local storage, update theme meta data error: ', err);
-            reject(themeMeta);
-        }
-    });
+    return results;
 }
 
 export function storageDeleteThemeData(theme: ShopifyTheme):boolean {
