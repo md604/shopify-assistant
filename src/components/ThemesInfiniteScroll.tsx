@@ -20,7 +20,7 @@ export function ThemesInfiniteScroll(props: { tabThemes: ShopifyTheme[] }) {
         }, 
         [props.tabThemes, currentPage]
     );
-
+    
     useEffect(
         () => {
             if (isVisible && currentPage * THEMES_BY_PAGE < props.tabThemes.length) {

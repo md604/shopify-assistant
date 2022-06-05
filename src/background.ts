@@ -4,6 +4,11 @@ import {
     generateDummyThemes,
     removeDummyThemes
 } from './utils/storage';
+import { LifoPromiseQueue } from './utils/LifoPromiseQueueClass';
+
+export interface CooldownMap {
+    [key: string|number]: number
+}
 
 const filter = {
     url: [
@@ -12,11 +17,7 @@ const filter = {
         },
     ],
 };
-
-export interface CooldownMap {
-    [key: string|number]: number
-}
-
+const promiseQueue = new LifoPromiseQueue();
 const FETCH_COOLDOWN_TIME:number = 1000 * 60 * 1; // 1 mins in ms
 const shopCooldownMap:CooldownMap = {};
 
@@ -52,35 +53,33 @@ function fetchShopThemes(url:string, domainName:string) {
 }
 
 // Listen for messages from the site
-chrome.runtime.onMessage.addListener(
-    async function(message, sender, sendResponse) {
-        if (message.to == 'sw' && message.type) {
-            switch (message.type) {
-                case 'newThemes': 
-                    // a message comes from the injected script that gets shopify themes
-                    // console.log('Got a message of type THEMES', message.data);
-                    storageUpdateOriginalThemesData({
-                        domainName: message.domainName,
-                        themes: message.data.themes ? message.data.themes : [] 
-                    });
-                break;
-                case 'updateThemeMeta': 
-                    // console.log('Got a message of type ShopifyTheme', message.data);
-                    await storageUpdateThemeMetaData(message.data.theme ? message.data.theme : {});
-                break;
-                default: console.log('Unknown message type');
-            }
-        } else {
-            console.log('Message type is not present');
+type MessageResponse = (response?: any) => void;
+async function messageHandler(message:any, sender: chrome.runtime.MessageSender, sendResponse: MessageResponse) {
+    if (message.to == 'sw' && message.type) {
+        switch (message.type) {
+            case 'newThemes': 
+                // a message comes from the injected script that gets shopify themes
+                storageUpdateOriginalThemesData({
+                    domainName: message.domainName,
+                    themes: message.data.themes ? message.data.themes : [] 
+                });
+            break;
+            case 'updateThemeMeta': 
+                promiseQueue.add(storageUpdateThemeMetaData.bind(null, message.data.theme ? message.data.theme : {}));
+            break;
+            default: console.log('Unknown message type');
         }
+    } else {
+        console.log('Message type is not present');
     }
-);
+}
+chrome.runtime.onMessage.addListener(messageHandler);
 
 chrome.webNavigation.onCompleted.addListener((details) => {
     const baseUrl = details.url.split('admin')[0], // https://.*myshopify.com/
         domainName = baseUrl.split('//')[1].replace('/',''), // shopname.myshopify.com
         themesUrl = `${baseUrl}admin/themes.json`;
-    console.info("The user has loaded my favorite website!", details.url, themesUrl);
+    // console.info("The user has loaded my favorite website!", details.url, themesUrl);
     // Check if this site was visited recently
     if (isShopCooldownExpired(domainName)) {
         console.log('Shop is ready for a sync: ', domainName);
