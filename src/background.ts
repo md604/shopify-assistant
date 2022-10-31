@@ -4,7 +4,7 @@ import {
     generateDummyThemes,
     removeDummyThemes
 } from './utils/storage';
-import { LifoPromiseQueue } from './utils/LifoPromiseQueueClass';
+import { FifoPromiseQueue } from './utils/FifoPromiseQueueClass';
 
 export interface CooldownMap {
     [key: string|number]: number
@@ -17,7 +17,7 @@ const filter = {
         },
     ],
 };
-const promiseQueue = new LifoPromiseQueue();
+const promiseQueue = new FifoPromiseQueue();
 const FETCH_COOLDOWN_TIME:number = 1000 * 60 * 1; // 1 mins in ms
 const shopCooldownMap:CooldownMap = {};
 
