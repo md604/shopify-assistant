@@ -7,7 +7,8 @@ module.exports = {
   entry: {
     popup: join(__dirname, 'src/popup.tsx'),
     background: join(__dirname, 'src/background.ts'),
-    searchWorker: join(__dirname, 'src/searchWorker.ts')
+    searchWorker: join(__dirname, 'src/searchWorker.ts'),
+    themesAdminData: join(__dirname, 'src/themesAdminData.ts')
   },
   output: {
     path: join(__dirname, 'dist'),

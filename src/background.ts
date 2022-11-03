@@ -6,6 +6,8 @@ import {
 } from './utils/storage';
 import { FifoPromiseQueue } from './utils/FifoPromiseQueueClass';
 
+
+
 export interface CooldownMap {
     [key: string|number]: number
 }
@@ -89,6 +91,37 @@ chrome.webNavigation.onCompleted.addListener((details) => {
             func: fetchShopThemes,
             args: [themesUrl,domainName]
         });
+        setTimeout(()=>{
+            chrome.webNavigation.getAllFrames(
+                {
+                    tabId: details.tabId 
+                },
+                (frames) => {
+                    console.log('Frames: ', frames);
+                    if (frames) {
+                        for(let i=0; i < frames.length; i++){
+                            if (frames[i].parentFrameId === 0 
+                                && frames[i].url.indexOf('admin/online-store/themes') > 0) {
+                                chrome.scripting.executeScript({
+                                    target: { 
+                                        tabId: details.tabId, 
+                                        frameIds: [frames[i].frameId]
+                                    },
+                                    files: ['themesAdminData.js']
+                                });        
+                            }
+                        }
+                    }
+                }
+            );
+        }, 7000);
+        
+        /*
+        chrome.scripting.executeScript({
+            target: { tabId: details.tabId },
+            files: ['themesAdminData.js']
+        });
+        */
     }
 }, filter);
 
