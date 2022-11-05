@@ -102,13 +102,20 @@ chrome.webNavigation.onCompleted.addListener((details) => {
                         for(let i=0; i < frames.length; i++){
                             if (frames[i].parentFrameId === 0 
                                 && frames[i].url.indexOf('admin/online-store/themes') > 0) {
-                                chrome.scripting.executeScript({
+                                try {
+                                    chrome.scripting.executeScript({
                                     target: { 
                                         tabId: details.tabId, 
                                         frameIds: [frames[i].frameId]
                                     },
                                     files: ['themesAdminData.js']
-                                });        
+                                    },
+                                    (injectionResults) => {
+                                        console.log('Injection results: ', injectionResults)
+                                    }); 
+                                } catch(error) {
+                                    console.log('The injection error: ', error);    
+                                }       
                             }
                         }
                     }

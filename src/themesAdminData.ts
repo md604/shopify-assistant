@@ -1,6 +1,7 @@
 import createApp from "@shopify/app-bridge";
 import { getSessionToken } from "@shopify/app-bridge-utils";
 
+
 function graphqlShopThemesMeta() {
     /*
     const operationName = 'ThemeIndexSecondaryData';
@@ -127,12 +128,33 @@ function graphqlShopThemesMeta() {
         */      
         try {
             const app = createApp(bridgeConfig);
+            const unsubscribeFromErrors = app.error(data => {
+                /*
+                const {
+                  type,    // the error type
+                  action,  // the original action including its id
+                  message, // additional hints on how to fix the error
+                } = data;
+              
+                // Handle all errors here
+              
+                switch(type) {
+                  case Error.Action.INVALID_PAYLOAD:
+                  // Do something with the error
+                  break;
+                }
+                */
+                // Handle all actions here
+                // console.log('Error data event: ', data);
+
+                // Suppress all app bridge errors that show up in extention's logs
+            });
             getSessionToken(app).then(token => {
                 console.log('Session token: ', token)
                 if (token) {
                     const operationName = 'ThemeIndexSecondaryData';
                     const variables = {
-                        'first':5,
+                        'first':20,
                         'themeUpdatesEnabled':true,
                         'editedThemeUpdatesEnabled':false
                     };
@@ -243,9 +265,11 @@ function graphqlShopThemesMeta() {
                     .then(r => r.json())
                     .then(data => console.log('GraphQl data returned:', data));
                 }
+                
             });
         } catch (error) {
             console.log('An error occured. Oops.');
+            return false;
         }
     }
 }
