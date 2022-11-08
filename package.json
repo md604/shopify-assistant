@@ -2,7 +2,7 @@
   "name": "shopify-assistant",
   "private": true,
   "version": "0.1.1",
-  "description": "Chrome extention that makes your daily shopify routine easier",
+  "description": "Chrome extension that makes your daily shopify routine easier",
   "license": "MIT",
   "scripts": {
     "prebuild:prod": "yarn test",

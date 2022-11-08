@@ -97,18 +97,17 @@ chrome.webNavigation.onCompleted.addListener((details) => {
                     tabId: details.tabId 
                 },
                 (frames) => {
-                    console.log('Frames: ', frames);
                     if (frames) {
                         for(let i=0; i < frames.length; i++){
                             if (frames[i].parentFrameId === 0 
                                 && frames[i].url.indexOf('admin/online-store/themes') > 0) {
                                 try {
                                     chrome.scripting.executeScript({
-                                    target: { 
-                                        tabId: details.tabId, 
-                                        frameIds: [frames[i].frameId]
-                                    },
-                                    files: ['themesAdminData.js']
+                                        target: { 
+                                            tabId: details.tabId, 
+                                            frameIds: [frames[i].frameId]
+                                        },
+                                        files: ['themesAdminData.js']
                                     },
                                     (injectionResults) => {
                                         console.log('Injection results: ', injectionResults)
@@ -134,7 +133,7 @@ chrome.webNavigation.onCompleted.addListener((details) => {
 
 chrome.runtime.onInstalled.addListener(async (details) => {
     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-        // do something after reloading extention
+        // do something after reloading extension
         
         //console.log('Reload extension');
         //generateDummyThemes(20, 20);

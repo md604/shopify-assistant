@@ -250,7 +250,7 @@ export function storageDeleteThemeData(theme: ShopifyTheme):boolean {
 
 // Test functions
 
-// on extention reload event it populates the store 
+// on extension reload event it populates the store 
 // with a dummy theme's data if it does not already exist there
 
 function generateDummyTheme(themeIndex = 0, shopIndex = 0):any {
