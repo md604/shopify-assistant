@@ -221,7 +221,17 @@ function graphqlShopThemesMeta() {
                         })
                     })
                     .then(r => r.json())
-                    .then(data => console.log('GraphQl data returned:', data));
+                    .then(data => {
+                        console.log('GraphQl data returned:', data);
+                        chrome.runtime.sendMessage(
+                            {
+                                type: 'gitThemes',
+                                domainName: window.location.hostname,
+                                data,
+                                to: 'sw'
+                            }
+                        );
+                    });
                 }
                 
             });

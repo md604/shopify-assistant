@@ -66,6 +66,9 @@ async function messageHandler(message:any, sender: chrome.runtime.MessageSender,
                     themes: message.data.themes ? message.data.themes : [] 
                 });
             break;
+            case 'gitThemes':
+                console.log('Get data from the client side: ', message.data);
+            break;
             case 'updateThemeMeta': 
                 promiseQueue.add(storageUpdateThemeMetaData.bind(null, message.data.theme ? message.data.theme : {}));
             break;
@@ -91,43 +94,39 @@ chrome.webNavigation.onCompleted.addListener((details) => {
             func: fetchShopThemes,
             args: [themesUrl,domainName]
         });
-        setTimeout(()=>{
-            chrome.webNavigation.getAllFrames(
-                {
-                    tabId: details.tabId 
-                },
-                (frames) => {
-                    if (frames) {
-                        for(let i=0; i < frames.length; i++){
-                            if (frames[i].parentFrameId === 0 
-                                && frames[i].url.indexOf('admin/online-store/themes') > 0) {
-                                try {
-                                    chrome.scripting.executeScript({
-                                        target: { 
-                                            tabId: details.tabId, 
-                                            frameIds: [frames[i].frameId]
+        // Launch graphql theme requests when the embeded theme app's iframe is present 
+        if (details.url.match('admin/themes')) {
+            setTimeout(() => {
+                chrome.webNavigation.getAllFrames(
+                    {
+                        tabId: details.tabId 
+                    },
+                    (frames) => {
+                        if (frames) {
+                            for(let i = 0; i < frames.length; i++){
+                                if (frames[i].parentFrameId === 0 
+                                    && frames[i].url.indexOf('admin/online-store/themes') > 0) {
+                                    try {
+                                        chrome.scripting.executeScript({
+                                            target: { 
+                                                tabId: details.tabId, 
+                                                frameIds: [frames[i].frameId]
+                                            },
+                                            files: ['themesAdminData.js']
                                         },
-                                        files: ['themesAdminData.js']
-                                    },
-                                    (injectionResults) => {
-                                        console.log('Injection results: ', injectionResults)
-                                    }); 
-                                } catch(error) {
-                                    console.log('The injection error: ', error);    
-                                }       
+                                        (injectionResults) => {
+                                            console.log('Injection results: ', injectionResults)
+                                        }); 
+                                    } catch(error) {
+                                        console.log('The injection error: ', error);    
+                                    }       
+                                }
                             }
                         }
                     }
-                }
-            );
-        }, 7000);
-        
-        /*
-        chrome.scripting.executeScript({
-            target: { tabId: details.tabId },
-            files: ['themesAdminData.js']
-        });
-        */
+                );
+            }, 7000); // the delay partly mitigates a chrome's splash screen for unupdated browsers
+        }
     }
 }, filter);
 
