@@ -13,11 +13,17 @@ export interface ThemeMeta {
     pinned: boolean;
     available: boolean;
     tags: string[];
+    githubRepositoryId: number;
+    githubRepositoryName: string;
+    githubBranchName: string;
 }
 export const defaultThemeMeta: ThemeMeta = {
     pinned: false,
     available: true,
-    tags: []
+    tags: [],
+    githubRepositoryId: 0,
+    githubRepositoryName: '',
+    githubBranchName: ''
 };
 
 // data representation for the popup UI
@@ -38,7 +44,10 @@ export const defaultShopifyTheme: ShopifyTheme = {
     pinned: false,
     id: 0,
     available: true,
-    tags:[]
+    tags:[],
+    githubRepositoryId: 0,
+    githubRepositoryName: '',
+    githubBranchName: ''
 };
 
 // augmented data representaion of the raw data (themes: any) fetched via store API
@@ -48,4 +57,4 @@ export interface StorageThemesData {
     themes: any
 }
 
-export {}
+export default {}

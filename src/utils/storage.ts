@@ -67,7 +67,10 @@ export function transformStorageShopsDataToShopifyThemes(storageData:any):Shopif
                     id: theme.id,
                     pinned: themeMeta['pinned'],
                     available: themeMeta['available'],
-                    tags: themeMeta['tags']
+                    tags: themeMeta['tags'],
+                    githubRepositoryId: themeMeta['githubRepositoryId'],
+                    githubRepositoryName: themeMeta['githubRepositoryName'],
+                    githubBranchName: themeMeta['githubBranchName']
                 }
             });
         allThemes = [...allThemes, ...domainThemes];
@@ -196,10 +199,10 @@ export async function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<Th
     
     const currentShops = await chrome.storage.local.get(SHOPS_KEY)
         .then(result => {
-                if (chrome.runtime.lastError) {
-                    throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
-                }
-                return result; 
+            if (chrome.runtime.lastError) {
+                throw new Error(`Failed to call a get storage API, ${chrome.runtime.lastError.message}`);
+            }
+            return result; 
         })
         .catch(error => {
             console.log(`Error in a storageUpdateThemeMetaData function, get section: `, error);
