@@ -8,7 +8,7 @@ import {
 import { 
     transformStorageShopsDataToShopifyThemes,
     getUpdatedStorageShops,
-    getUpdatedStorageShopsWithNewThemeMeta,
+    getUpdatedStorageShopsWithNewThemesMeta,
     deleteTheme
 } from '../src/utils/storage';
 import { 
@@ -41,7 +41,8 @@ describe("Storage API", () => {
     });
     
     it("Update meta data of a selected theme", () => {
-        const shops = getUpdatedStorageShopsWithNewThemeMeta('test-shop.myshopify.com', 105572627888, mockupStorageNewThemeMeta, testStorageData);
+        // 2bd: convert to themes array
+        const shops = getUpdatedStorageShopsWithNewThemesMeta('test-shop.myshopify.com', 105572627888, mockupStorageNewThemeMeta, testStorageData);
         expect({shops}).toMatchObject(mockupUpdataedStorageWithNewThemeMeta);
     });
 

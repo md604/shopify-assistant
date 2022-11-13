@@ -1,10 +1,12 @@
 import { 
     storageUpdateOriginalThemesData, 
-    storageUpdateThemeMetaData,
+    storageUpdateThemesMetaData,
     generateDummyThemes,
-    removeDummyThemes
+    removeDummyThemes,
+    transformGraphQLGitDataToShopifyThemes
 } from './utils/storage';
 import { FifoPromiseQueue } from './utils/FifoPromiseQueueClass';
+import { ShopifyTheme } from './utils/interfaces';
 
 
 
@@ -68,9 +70,16 @@ async function messageHandler(message:any, sender: chrome.runtime.MessageSender,
             break;
             case 'gitThemes':
                 console.log('Get data from the client side: ', message.data);
+                // convert graphQL results into ShopifyTheme array
+                const themes:ShopifyTheme[] = transformGraphQLGitDataToShopifyThemes({
+                    themes: message.data.data.onlineStore.themes,
+                    domainName: message.domainName 
+                });
+                // update theme metadata in the store
+                promiseQueue.add(storageUpdateThemesMetaData.bind(null, themes));
             break;
             case 'updateThemeMeta': 
-                promiseQueue.add(storageUpdateThemeMetaData.bind(null, message.data.theme ? message.data.theme : {}));
+                promiseQueue.add(storageUpdateThemesMetaData.bind(null, [message.data.theme ? message.data.theme : {}]));
             break;
             default: console.log('Unknown message type');
         }

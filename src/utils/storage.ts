@@ -2,6 +2,7 @@ import {
     ShopifyTheme, 
     StorageThemesData,
     ThemeMeta,
+    defaultShopifyTheme,
     defaultThemeMeta 
 } from './interfaces';
 
@@ -117,16 +118,28 @@ export function getUpdatedStorageShops(newThemeData:StorageThemesData, currentSh
     return { ...currentShopsData[SHOPS_KEY], ...shop };
 }
 
-export function getUpdatedStorageShopsWithNewThemeMeta(domainName: string, id: number, themeMeta: ThemeMeta, currentShopsData:any) {
+export function getUpdatedStorageShopsWithNewThemesMeta(themes: ShopifyTheme[], currentShopsData:any) {
     let shop:any = {};
+    for (let i = 0; i < themes.length; i++) {
+        // extract a meta data from the current theme
+        const themeMeta:any = {},
+        { domainName, id } = themes[i];
+        let metaKey: keyof ThemeMeta;
 
-    if (currentShopsData && currentShopsData[SHOPS_KEY] && currentShopsData[SHOPS_KEY][domainName]) {
-        const storeShop:any = currentShopsData[SHOPS_KEY][domainName];
-        storeShop[SHOP_THEMES_META_KEY] ??= {};
-        storeShop[SHOP_THEMES_META_KEY][id] = {...themeMeta};
-        shop[domainName] = {...storeShop};
+        for(metaKey in defaultThemeMeta) {
+            themeMeta[metaKey] = themes[i][metaKey];
+        }
+        // update the meta data in the shop object
+        if (currentShopsData 
+            && currentShopsData[SHOPS_KEY] 
+            && currentShopsData[SHOPS_KEY][domainName]) {
+            const storeShop:any = currentShopsData[SHOPS_KEY][domainName];
+            storeShop[SHOP_THEMES_META_KEY] ??= {};
+            storeShop[SHOP_THEMES_META_KEY][id] = {...themeMeta};
+            shop[domainName] = {...storeShop};
+        }
     }
-
+    // return the storage state with the updated shops object
     return { ...currentShopsData[SHOPS_KEY], ...shop };
 }
 
@@ -137,6 +150,27 @@ export function deleteTheme(domainName: string, id: number, currentShopsData:any
     delete storeShop[SHOP_THEMES_KEY][id];
 
     return { ...currentShopsData[SHOPS_KEY], [domainName]: storeShop };
+}
+
+export function transformGraphQLGitDataToShopifyThemes(graphQLGitData:any):ShopifyTheme[] {
+    const themes:ShopifyTheme[] = [];
+    const { domainName } = graphQLGitData; 
+    if (graphQLGitData.themes.edges) {
+        const gqlThemes = graphQLGitData.themes.edges;
+        for (let i = 0; i < gqlThemes.length; i++) {
+            const newThemeFields:Partial<ShopifyTheme> = {};
+            newThemeFields.id = gqlThemes[i].node.id.split('/').pop();
+            newThemeFields.domainName = domainName;
+            if (gqlThemes[i].node.versionControlConfiguration) {
+                const nodeGitData = gqlThemes[i].node.versionControlConfiguration;
+                newThemeFields.githubRepositoryId = nodeGitData.githubRepositoryId;
+                newThemeFields.githubRepositoryName = nodeGitData.githubRepositoryName;
+                newThemeFields.githubBranchName = nodeGitData.githubBranchName;
+            }
+            themes.push({...defaultShopifyTheme, ...newThemeFields});
+        }
+    }
+    return themes;
 }
 
 // Pure functions end
@@ -188,7 +222,8 @@ export function storageUpdateOriginalThemesData(data:StorageThemesData):Promise<
     });
 }
 
-export async function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<ThemeMeta> {
+export async function storageUpdateThemesMetaData(themes: ShopifyTheme[]):Promise<ThemeMeta[]> {
+    /*
     const themeMeta:any = {},
         { domainName, id } = theme;
     let metaKey: keyof ThemeMeta;
@@ -196,7 +231,8 @@ export async function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<Th
     for(metaKey in defaultThemeMeta) {
         themeMeta[metaKey] = theme[metaKey];
     }
-    
+    */
+    let getStorageError:string = '';
     const currentShops = await chrome.storage.local.get(SHOPS_KEY)
         .then(result => {
             if (chrome.runtime.lastError) {
@@ -205,23 +241,31 @@ export async function storageUpdateThemeMetaData(theme: ShopifyTheme):Promise<Th
             return result; 
         })
         .catch(error => {
-            console.log(`Error in a storageUpdateThemeMetaData function, get section: `, error);
+            console.log(`Error in a storageUpdateThemesMetaData function, get section: `, error);
+            getStorageError = error.message;
             return {shops:{}};
         });
-    
-    const shops = getUpdatedStorageShopsWithNewThemeMeta(domainName,id,themeMeta, currentShops);
-    
+    // return an empty meta array if there was un error
+    if (getStorageError.length === 0) return [];
+    const shops = getUpdatedStorageShopsWithNewThemesMeta(themes, currentShops);
+    const themesMeta:ThemeMeta[] = [];
+    for (let i = 0; i < themes.length; i++) {
+        const theme:ShopifyTheme = themes[i];
+        if (shops[theme.domainName] && shops[theme.domainName][SHOP_THEMES_META_KEY][theme.id]) {
+            themesMeta.push(shops[theme.domainName][SHOP_THEMES_META_KEY][theme.id]);
+        }
+    }
     const results = await chrome.storage.local.set({ shops })
         .then(result => {
             if (chrome.runtime.lastError) {
                 // will last catch get this error?
                 throw new Error(`Failed to call storage API, ${chrome.runtime.lastError.message}`);
             }
-            return themeMeta;
+            return themesMeta;
         })
         .catch(error => {
-            console.log(`Error in a storageUpdateThemeMetaData function, set section: `, error);
-            return themeMeta;
+            console.log(`Error in a storageUpdateThemesMetaData function, set section: `, error);
+            return themesMeta;
         });
 
     return results;
