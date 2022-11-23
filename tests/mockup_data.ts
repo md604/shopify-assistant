@@ -344,7 +344,28 @@ export const mockupCompleteStorage: any = {
 export const mockupStorageNewThemeMeta: ThemeMeta = {
     pinned: true,
     available: true,
-    tags: ['galaxy']
+    tags: ['galaxy'],
+    githubRepositoryId: 0,
+    githubRepositoryName: '',
+    githubBranchName: ''
+};
+
+export const mockupShopifyThemeNewThemeMeta: ShopifyTheme = {
+    "name": "Search feature - Test [gitHub]",
+    "domainName": "test-shop.myshopify.com",
+    "lastUpdate": 1647111428000,
+    "published": false,
+    "developer": false,
+    "id": 127641171777,
+    "pinned": true,
+    "available": true,
+    "tags": [
+        "starcraft",
+        "test"
+    ],
+    "githubRepositoryId": 0,
+    "githubRepositoryName": '',
+    "githubBranchName": 'feat/test'
 };
 
 export const mockupUpdataedStorageWithNewThemeMeta: any = {
@@ -386,7 +407,10 @@ export const mockupUpdataedStorageWithNewThemeMeta: any = {
                     "tags": [
                         "starcraft",
                         "test"
-                    ]
+                    ],
+                    "githubRepositoryId": 0,
+                    "githubRepositoryName": '',
+                    "githubBranchName": 'feat/test'
                 }
             }
         }
@@ -435,7 +459,10 @@ export const mockupShopifyThemes: ShopifyTheme[] = [
         "id": 105572627888,
         "pinned": false,
         "available": true,
-        "tags": []
+        "tags": [],
+        "githubRepositoryId": 0,
+        "githubRepositoryName": '',
+        "githubBranchName": ''
     },
     {
         "name": "Search feature - Test [gitHub]",
@@ -449,6 +476,9 @@ export const mockupShopifyThemes: ShopifyTheme[] = [
         "tags": [
             "starcraft",
             "test"
-        ]
+        ],
+        "githubRepositoryId": 0,
+        "githubRepositoryName": '',
+        "githubBranchName": ''
     }
 ];

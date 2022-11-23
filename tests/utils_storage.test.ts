@@ -16,9 +16,9 @@ import {
     mockupShopifyThemes,
     mockupStorageNewThemes,
     mockupUpdatedStorage,
-    mockupStorageNewThemeMeta,
     mockupUpdataedStorageWithNewThemeMeta,
-    mockupStorageWithDeletedTheme
+    mockupStorageWithDeletedTheme,
+    mockupShopifyThemeNewThemeMeta
 } from './mockup_data';
 
 
@@ -40,14 +40,14 @@ describe("Storage API", () => {
         expect({shops}).toMatchObject(mockupUpdatedStorage);
     });
     
-    it("Update meta data of a selected theme", () => {
-        // 2bd: convert to themes array
-        const shops = getUpdatedStorageShopsWithNewThemesMeta('test-shop.myshopify.com', 105572627888, mockupStorageNewThemeMeta, testStorageData);
+    it("Update meta data for selected themes", () => {
+        const shops = getUpdatedStorageShopsWithNewThemesMeta([mockupShopifyThemeNewThemeMeta], testStorageData);
+        console.log('Updated shop:', shops['test-shop.myshopify.com']['themesMeta']['105572627888']);
         expect({shops}).toMatchObject(mockupUpdataedStorageWithNewThemeMeta);
     });
 
     it("Delete theme from the storage", () => {
-        const shops = deleteTheme('test-shop.myshopify.com', 105572627888, testStorageData);
+        //const shops = deleteTheme('test-shop.myshopify.com', 105572627888, testStorageData);
         expect({shops}).toMatchObject(mockupStorageWithDeletedTheme);
     });
     
